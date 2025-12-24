@@ -1,159 +1,171 @@
 package com.company.qa.unified.utils;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
- * Selenium wait utilities for web and mobile.
+ * WaitUtils
  *
- * Usage:
- *   WebElement element = WaitUtils.waitForVisible(driver, By.id("btn"), 10);
- *   WaitUtils.waitForClickable(driver, By.id("btn"), 10);
+ * Centralized explicit wait utilities for:
+ * - Selenium WebDriver
+ * - Appium Driver (Android / iOS)
+ *
+ * RULES:
+ * ❌ No Thread.sleep()
+ * ❌ No implicit waits
+ * ✅ Explicit waits only
  */
 public final class WaitUtils {
 
-    private static final Log log = Log.get(WaitUtils.class);
+    private static final int DEFAULT_POLLING_MS = 500;
 
     private WaitUtils() {
-        // utility
+        // Utility class
     }
 
-    /**
-     * Wait for element to be visible.
-     */
+    /* =========================================================
+       CORE WAIT FACTORY
+       ========================================================= */
+
+    private static WebDriverWait wait(WebDriver driver, int seconds) {
+        return new WebDriverWait(driver, Duration.ofSeconds(seconds))
+                .pollingEvery(Duration.ofMillis(DEFAULT_POLLING_MS))
+                .ignoring(NoSuchElementException.class)
+                .ignoring(StaleElementReferenceException.class);
+    }
+
+    /* =========================================================
+       VISIBILITY
+       ========================================================= */
+
     public static WebElement waitForVisible(
             WebDriver driver,
             By locator,
             int seconds
     ) {
-        try {
-            WebDriverWait wait = new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(seconds)
-            );
-            return wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(locator)
-            );
-        } catch (Exception e) {
-            log.warn("Element not visible within {} seconds: {}", seconds, locator);
-            throw new RuntimeException(
-                    "Element not visible: " + locator, e);
-        }
+        return wait(driver, seconds)
+                .until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
-    /**
-     * Wait for element to be clickable.
-     */
+    public static List<WebElement> waitForAllVisible(
+            WebDriver driver,
+            By locator,
+            int seconds
+    ) {
+        return wait(driver, seconds)
+                .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
+    }
+
+    /* =========================================================
+       CLICKABILITY
+       ========================================================= */
+
     public static WebElement waitForClickable(
             WebDriver driver,
             By locator,
             int seconds
     ) {
-        try {
-            WebDriverWait wait = new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(seconds)
-            );
-            return wait.until(
-                    ExpectedConditions.elementToBeClickable(locator)
-            );
-        } catch (Exception e) {
-            log.warn("Element not clickable within {} seconds: {}", seconds, locator);
-            throw new RuntimeException(
-                    "Element not clickable: " + locator, e);
-        }
+        return wait(driver, seconds)
+                .until(ExpectedConditions.elementToBeClickable(locator));
     }
 
-    /**
-     * Wait for element to be present.
-     */
+    /* =========================================================
+       PRESENCE
+       ========================================================= */
+
     public static WebElement waitForPresent(
             WebDriver driver,
             By locator,
             int seconds
     ) {
-        try {
-            WebDriverWait wait = new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(seconds)
-            );
-            return wait.until(
-                    ExpectedConditions.presenceOfElementLocated(locator)
-            );
-        } catch (Exception e) {
-            log.warn("Element not present within {} seconds: {}", seconds, locator);
-            throw new RuntimeException(
-                    "Element not present: " + locator, e);
-        }
+        return wait(driver, seconds)
+                .until(ExpectedConditions.presenceOfElementLocated(locator));
     }
 
-    /**
-     * Wait for element to disappear.
-     */
-    public static void waitForInvisible(
+    /* =========================================================
+       INVISIBILITY / DISAPPEAR
+       ========================================================= */
+
+    public static boolean waitForInvisible(
+            WebDriver driver,
+            By locator,
+            int seconds
+    ) {
+        return wait(driver, seconds)
+                .until(ExpectedConditions.invisibilityOfElementLocated(locator));
+    }
+
+    /* =========================================================
+       TEXT & ATTRIBUTE
+       ========================================================= */
+
+    public static boolean waitForText(
+            WebDriver driver,
+            By locator,
+            String expectedText,
+            int seconds
+    ) {
+        return wait(driver, seconds)
+                .until(ExpectedConditions.textToBePresentInElementLocated(
+                        locator, expectedText));
+    }
+
+    public static boolean waitForAttribute(
+            WebDriver driver,
+            By locator,
+            String attribute,
+            String value,
+            int seconds
+    ) {
+        return wait(driver, seconds)
+                .until(ExpectedConditions.attributeContains(
+                        locator, attribute, value));
+    }
+
+    /* =========================================================
+       URL & PAGE STATE (WEB)
+       ========================================================= */
+
+    public static boolean waitForUrlContains(
+            WebDriver driver,
+            String partialUrl,
+            int seconds
+    ) {
+        return wait(driver, seconds)
+                .until(ExpectedConditions.urlContains(partialUrl));
+    }
+
+    /* =========================================================
+       SAFE UTILITIES
+       ========================================================= */
+
+    public static boolean isElementVisible(
             WebDriver driver,
             By locator,
             int seconds
     ) {
         try {
-            WebDriverWait wait = new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(seconds)
-            );
-            wait.until(
-                    ExpectedConditions.invisibilityOfElementLocated(locator)
-            );
-            log.debug("Element became invisible: {}", locator);
-        } catch (Exception e) {
-            log.warn("Element still visible after {} seconds: {}", seconds, locator);
-            throw new RuntimeException(
-                    "Element did not become invisible: " + locator, e);
+            waitForVisible(driver, locator, seconds);
+            return true;
+        } catch (TimeoutException e) {
+            return false;
         }
     }
 
-    /**
-     * Wait for element text to change.
-     */
-    public static void waitForTextChange(
+    public static boolean isElementClickable(
             WebDriver driver,
             By locator,
-            String oldText,
             int seconds
     ) {
         try {
-            WebDriverWait wait = new WebDriverWait(
-                    driver,
-                    Duration.ofSeconds(seconds)
-            );
-            wait.until(driver2 -> {
-                WebElement element = driver2.findElement(locator);
-                return !element.getText().equals(oldText);
-            });
-        } catch (Exception e) {
-            log.warn("Text did not change within {} seconds", seconds);
-            throw new RuntimeException(
-                    "Text did not change: " + locator, e);
+            waitForClickable(driver, locator, seconds);
+            return true;
+        } catch (TimeoutException e) {
+            return false;
         }
-    }
-
-    /**
-     * Wait for custom condition.
-     */
-    public static <T> T waitForCondition(
-            WebDriver driver,
-            com.google.common.base.Function<? super WebDriver, T> condition,
-            int seconds
-    ) {
-        WebDriverWait wait = new WebDriverWait(
-                driver,
-                Duration.ofSeconds(seconds)
-        );
-        return wait.until(condition);
     }
 }
-
