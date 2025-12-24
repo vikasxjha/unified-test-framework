@@ -1,0 +1,278 @@
+{
+  "defaultEnv": "QA",
+
+  "environments": {
+    "QA": {
+      "baseUrls": {
+        "web": "https://qa.truecaller.com",
+        "api": "https://api-qa.truecaller.com",
+        "admin": "https://admin-qa.truecaller.com"
+      },
+
+      "auth": {
+        "clientId": "qa-client-id",
+        "clientSecret": "qa-client-secret",
+        "tokenEndpoint": "/oauth/token",
+        "mfaEnabled": true
+      },
+
+      "credentials": {
+        "defaultUser": {
+          "username": "qa_user@company.com",
+          "password": "Password@123"
+        },
+        "adminUser": {
+          "username": "qa_admin@company.com",
+          "password": "Admin@123"
+        }
+      },
+
+      "web": {
+        "browser": "chromium",
+        "headless": true,
+        "timeouts": {
+          "pageLoadSeconds": 30,
+          "elementSeconds": 15
+        },
+        "visualTesting": {
+          "enabled": true,
+          "baselineDir": "visual-baseline",
+          "ignoreRegions": [
+            "css:.dynamic-ad",
+            "css:.timestamp",
+            "css:#live-banner"
+          ]
+        }
+      },
+
+      "mobile": {
+        "android": {
+          "enabled": true,
+          "platformVersion": "13",
+          "deviceName": "Pixel_6_Emulator",
+          "appPackage": "com.truecaller",
+          "appActivity": "com.truecaller.ui.MainActivity",
+          "appPath": "apps/truecaller-qa.apk"
+        },
+        "ios": {
+          "enabled": true,
+          "platformVersion": "17.0",
+          "deviceName": "iPhone 14",
+          "bundleId": "com.truecaller.ios",
+          "appPath": "apps/truecaller-qa.ipa"
+        }
+      },
+
+      "features": {
+        "premium": true,
+        "spamProtection": true,
+        "callRecording": false
+      },
+
+      "experiments": {
+        "searchRankingV2": "treatment",
+        "recommendationModel": "control"
+      },
+
+      "kafka": {
+        "enabled": true,
+        "brokers": "kafka-qa.truecaller.internal:9092",
+        "topics": {
+          "lookupEvents": "lookup-events-qa",
+          "notificationEvents": "notification-events-qa",
+          "subscriptionEvents": "subscription-events-qa"
+        },
+        "consumerGroup": "qa-automation"
+      },
+
+      "metrics": {
+        "prometheus": {
+          "enabled": true,
+          "endpoint": "https://metrics-qa.truecaller.com",
+          "queryTimeoutSeconds": 10
+        }
+      },
+
+      "security": {
+        "rateLimitEnabled": true,
+        "maxRequestsPerMinute": 100,
+        "owaspZap": {
+          "enabled": true,
+          "host": "localhost",
+          "port": 8090
+        }
+      },
+
+      "timeouts": {
+        "apiSeconds": 15,
+        "dbSeconds": 10,
+        "eventSeconds": 20
+      }
+    },
+
+    "STAGE": {
+      "baseUrls": {
+        "web": "https://stage.truecaller.com",
+        "api": "https://api-stage.truecaller.com",
+        "admin": "https://admin-stage.truecaller.com"
+      },
+
+      "auth": {
+        "clientId": "stage-client-id",
+        "clientSecret": "stage-client-secret",
+        "tokenEndpoint": "/oauth/token",
+        "mfaEnabled": true
+      },
+
+      "credentials": {
+        "defaultUser": {
+          "username": "stage_user@company.com",
+          "password": "Password@123"
+        },
+        "adminUser": {
+          "username": "stage_admin@company.com",
+          "password": "Admin@123"
+        }
+      },
+
+      "web": {
+        "browser": "chromium",
+        "headless": true,
+        "timeouts": {
+          "pageLoadSeconds": 30,
+          "elementSeconds": 15
+        },
+        "visualTesting": {
+          "enabled": true,
+          "baselineDir": "visual-baseline",
+          "ignoreRegions": [
+            "css:.dynamic-ad",
+            "css:.timestamp"
+          ]
+        }
+      },
+
+      "mobile": {
+        "android": { "enabled": false },
+        "ios": { "enabled": false }
+      },
+
+      "features": {
+        "premium": true,
+        "spamProtection": true,
+        "callRecording": true
+      },
+
+      "experiments": {
+        "searchRankingV2": "treatment",
+        "recommendationModel": "treatment"
+      },
+
+      "kafka": {
+        "enabled": true,
+        "brokers": "kafka-stage.truecaller.internal:9092",
+        "topics": {
+          "lookupEvents": "lookup-events-stage",
+          "notificationEvents": "notification-events-stage",
+          "subscriptionEvents": "subscription-events-stage"
+        },
+        "consumerGroup": "stage-automation"
+      },
+
+      "metrics": {
+        "prometheus": {
+          "enabled": true,
+          "endpoint": "https://metrics-stage.truecaller.com",
+          "queryTimeoutSeconds": 10
+        }
+      },
+
+      "security": {
+        "rateLimitEnabled": true,
+        "maxRequestsPerMinute": 60,
+        "owaspZap": {
+          "enabled": false
+        }
+      },
+
+      "timeouts": {
+        "apiSeconds": 20,
+        "dbSeconds": 15,
+        "eventSeconds": 30
+      }
+    },
+
+    "PROD": {
+      "baseUrls": {
+        "web": "https://www.truecaller.com",
+        "api": "https://api.truecaller.com",
+        "admin": "https://admin.truecaller.com"
+      },
+
+      "auth": {
+        "clientId": "prod-client-id",
+        "clientSecret": "prod-client-secret",
+        "tokenEndpoint": "/oauth/token",
+        "mfaEnabled": true
+      },
+
+      "credentials": {
+        "defaultUser": {
+          "username": "prod_readonly@company.com",
+          "password": "REDACTED"
+        }
+      },
+
+      "web": {
+        "browser": "chromium",
+        "headless": true,
+        "timeouts": {
+          "pageLoadSeconds": 30,
+          "elementSeconds": 15
+        },
+        "visualTesting": {
+          "enabled": false
+        }
+      },
+
+      "mobile": {
+        "android": { "enabled": false },
+        "ios": { "enabled": false }
+      },
+
+      "features": {
+        "premium": true,
+        "spamProtection": true,
+        "callRecording": true
+      },
+
+      "experiments": {},
+
+      "kafka": {
+        "enabled": false
+      },
+
+      "metrics": {
+        "prometheus": {
+          "enabled": true,
+          "endpoint": "https://metrics.truecaller.com",
+          "queryTimeoutSeconds": 10
+        }
+      },
+
+      "security": {
+        "rateLimitEnabled": true,
+        "maxRequestsPerMinute": 30,
+        "owaspZap": {
+          "enabled": false
+        }
+      },
+
+      "timeouts": {
+        "apiSeconds": 10,
+        "dbSeconds": 5,
+        "eventSeconds": 15
+      }
+    }
+  }
+}

@@ -1,0 +1,153 @@
+version: "3.9"
+
+name: unified-test-framework
+
+networks:
+  test-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  kafka-data:
+  prometheus-data:
+  grafana-data:
+
+services:
+
+  # ============================================================
+  # DATABASE (Mock / Test DB)
+  # ============================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: utf-postgres
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - test-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================
+  # KAFKA + ZOOKEEPER (Event Validation)
+  # ============================================================
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    container_name: utf-zookeeper
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: "yes"
+    ports:
+      - "2181:2181"
+    networks:
+      - test-net
+
+  kafka:
+    image: bitnami/kafka:3.6
+    container_name: utf-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_CFG_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+    volumes:
+      - kafka-data:/bitnami/kafka
+    networks:
+      - test-net
+
+  # ============================================================
+  # PROMETHEUS (Metrics Validation)
+  # ============================================================
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    container_name: utf-prometheus
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - test-net
+
+  # ============================================================
+  # GRAFANA (Metrics Visualization)
+  # ============================================================
+  grafana:
+    image: grafana/grafana:10.3.1
+    container_name: utf-grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - test-net
+
+  # ============================================================
+  # OWASP ZAP (Security Scans)
+  # ============================================================
+  zap:
+    image: owasp/zap2docker-stable
+    container_name: utf-zap
+    command: zap.sh -daemon -host 0.0.0.0 -port 8090
+    ports:
+      - "8090:8090"
+    networks:
+      - test-net
+
+  # ============================================================
+  # LOG AGGREGATION (OPTIONAL - FILEBEAT MOCK)
+  # ============================================================
+  filebeat:
+    image: elastic/filebeat:8.12.2
+    container_name: utf-filebeat
+    user: root
+    volumes:
+      - ./logs:/var/log/app
+      - ./docker/filebeat.yml:/usr/share/filebeat/filebeat.yml
+    networks:
+      - test-net
+    depends_on:
+      - kafka
+
+  # ============================================================
+  # TEST RUNNER (OPTIONAL - CI MODE)
+  # ============================================================
+  test-runner:
+    image: maven:3.9.6-eclipse-temurin-17
+    container_name: utf-test-runner
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+      - ~/.m2:/root/.m2
+    environment:
+      ENV: QA
+      TAGS: "@smoke"
+      THREADS: 4
+    command: >
+      bash -c "./scripts/run-tests.sh"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - test-net
+    profiles:
+      - ci
