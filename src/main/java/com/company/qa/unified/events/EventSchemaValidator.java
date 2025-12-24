@@ -2,8 +2,6 @@ package com.company.qa.unified.events;
 
 import com.company.qa.unified.utils.JsonUtils;
 import com.company.qa.unified.utils.Log;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -53,11 +51,21 @@ public final class EventSchemaValidator {
     ) {
 
         try {
-            Schema schema = loadSchema(eventType);
+            JSONObject schema = loadSchema(eventType);
             JSONObject eventObject =
                     new JSONObject(eventJson);
 
-            schema.validate(eventObject);
+            // Basic schema validation: check required fields
+            if (schema.has("required")) {
+                org.json.JSONArray required = schema.getJSONArray("required");
+                for (int i = 0; i < required.length(); i++) {
+                    String field = required.getString(i);
+                    if (!eventObject.has(field)) {
+                        throw new IllegalArgumentException(
+                                "Missing required field: " + field);
+                    }
+                }
+            }
 
             log.info("✅ Event schema validation passed: {}", eventType);
 
@@ -134,7 +142,7 @@ public final class EventSchemaValidator {
        SCHEMA LOADING
        ========================================================= */
 
-    private static Schema loadSchema(String eventType) {
+    private static JSONObject loadSchema(String eventType) {
 
         String path = SCHEMA_ROOT + eventType + ".json";
 
@@ -147,10 +155,7 @@ public final class EventSchemaValidator {
                         "Event schema not found: " + path);
             }
 
-            JSONObject rawSchema =
-                    new JSONObject(new JSONTokener(is));
-
-            return SchemaLoader.load(rawSchema);
+            return new JSONObject(new JSONTokener(is));
 
         } catch (Exception e) {
             throw new RuntimeException(

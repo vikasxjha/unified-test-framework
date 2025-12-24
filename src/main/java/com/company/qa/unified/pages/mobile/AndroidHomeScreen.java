@@ -4,7 +4,6 @@ import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
@@ -34,26 +33,26 @@ public class AndroidHomeScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(AndroidHomeScreen.class);
 
-    private final AndroidDriver<?> driver;
+    private final AndroidDriver driver;
 
     /* =========================================================
        LOCATORS
        ========================================================= */
 
     private final By searchBox =
-            MobileBy.id("com.truecaller:id/searchText");
+            By.id("com.truecaller:id/searchText");
 
     private final By profileIcon =
-            MobileBy.id("com.truecaller:id/profileIcon");
+            By.id("com.truecaller:id/profileIcon");
 
     private final By notificationBell =
-            MobileBy.id("com.truecaller:id/notificationIcon");
+            By.id("com.truecaller:id/notificationIcon");
 
     private final By permissionAllowButton =
-            MobileBy.id("com.android.permissioncontroller:id/permission_allow_button");
+            By.id("com.android.permissioncontroller:id/permission_allow_button");
 
     private final By homeRoot =
-            MobileBy.id("com.truecaller:id/homeRoot");
+            By.id("com.truecaller:id/homeRoot");
 
     /* =========================================================
        CONSTRUCTOR

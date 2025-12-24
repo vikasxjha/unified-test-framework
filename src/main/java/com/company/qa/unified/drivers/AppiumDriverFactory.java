@@ -6,10 +6,8 @@ import com.company.qa.unified.utils.Log;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import io.appium.java_client.remote.AndroidMobileCapabilityType;
-import io.appium.java_client.remote.IOSMobileCapabilityType;
-import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.MutableCapabilities;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import java.net.URL;
 import java.time.Duration;
@@ -32,7 +30,7 @@ public final class AppiumDriverFactory {
     private static final Log log =
             Log.get(AppiumDriverFactory.class);
 
-    private static final ThreadLocal<AppiumDriver<?>> DRIVER =
+    private static final ThreadLocal<AppiumDriver> DRIVER =
             new ThreadLocal<>();
 
     private static final EnvironmentConfig ENV =
@@ -46,7 +44,7 @@ public final class AppiumDriverFactory {
        PUBLIC API
        ========================================================= */
 
-    public static AppiumDriver<?> getDriver() {
+    public static AppiumDriver getDriver() {
         if (DRIVER.get() == null) {
             throw new IllegalStateException(
                     "AppiumDriver not initialized. Call initDriver() first.");
@@ -63,7 +61,7 @@ public final class AppiumDriverFactory {
             String platform =
                     System.getProperty("platform", "android").toLowerCase();
 
-            AppiumDriver<?> driver = switch (platform) {
+            AppiumDriver driver = switch (platform) {
                 case "android" -> createAndroidDriver();
                 case "ios" -> createIosDriver();
                 default -> throw new IllegalArgumentException(
@@ -84,7 +82,7 @@ public final class AppiumDriverFactory {
     }
 
     public static void quitDriver() {
-        AppiumDriver<?> driver = DRIVER.get();
+        AppiumDriver driver = DRIVER.get();
         if (driver != null) {
             driver.quit();
             DRIVER.remove();
@@ -96,50 +94,50 @@ public final class AppiumDriverFactory {
        ANDROID DRIVER
        ========================================================= */
 
-    private static AndroidDriver<?> createAndroidDriver()
+    private static AndroidDriver createAndroidDriver()
             throws Exception {
 
-        MutableCapabilities caps = new MutableCapabilities();
+        DesiredCapabilities caps = new DesiredCapabilities();
 
-        caps.setCapability(MobileCapabilityType.PLATFORM_NAME, "Android");
-        caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
-        caps.setCapability(MobileCapabilityType.DEVICE_NAME,
+        caps.setCapability("platformName", "Android");
+        caps.setCapability("automationName", "UiAutomator2");
+        caps.setCapability("deviceName",
                 System.getProperty("deviceName", "Android Emulator"));
-        caps.setCapability(AndroidMobileCapabilityType.APP_PACKAGE,
+        caps.setCapability("appPackage",
                 System.getProperty("appPackage", "com.truecaller"));
-        caps.setCapability(AndroidMobileCapabilityType.APP_ACTIVITY,
+        caps.setCapability("appActivity",
                 System.getProperty("appActivity", ".ui.MainActivity"));
-        caps.setCapability(MobileCapabilityType.NO_RESET, true);
+        caps.setCapability("noReset", true);
 
         applyCommonCapabilities(caps);
 
         URL serverUrl = getServerUrl();
-        return new AndroidDriver<>(serverUrl, caps);
+        return new AndroidDriver(serverUrl, caps);
     }
 
     /* =========================================================
        IOS DRIVER
        ========================================================= */
 
-    private static IOSDriver<?> createIosDriver()
+    private static IOSDriver createIosDriver()
             throws Exception {
 
-        MutableCapabilities caps = new MutableCapabilities();
+        DesiredCapabilities caps = new DesiredCapabilities();
 
-        caps.setCapability(MobileCapabilityType.PLATFORM_NAME, "iOS");
-        caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "XCUITest");
-        caps.setCapability(MobileCapabilityType.DEVICE_NAME,
+        caps.setCapability("platformName", "iOS");
+        caps.setCapability("automationName", "XCUITest");
+        caps.setCapability("deviceName",
                 System.getProperty("deviceName", "iPhone 15"));
-        caps.setCapability(MobileCapabilityType.PLATFORM_VERSION,
+        caps.setCapability("platformVersion",
                 System.getProperty("platformVersion", "17.0"));
-        caps.setCapability(IOSMobileCapabilityType.BUNDLE_ID,
+        caps.setCapability("bundleId",
                 System.getProperty("bundleId", "com.truecaller.app"));
-        caps.setCapability(MobileCapabilityType.NO_RESET, true);
+        caps.setCapability("noReset", true);
 
         applyCommonCapabilities(caps);
 
         URL serverUrl = getServerUrl();
-        return new IOSDriver<>(serverUrl, caps);
+        return new IOSDriver(serverUrl, caps);
     }
 
     /* =========================================================
@@ -147,9 +145,9 @@ public final class AppiumDriverFactory {
        ========================================================= */
 
     private static void applyCommonCapabilities(
-            MutableCapabilities caps
+            DesiredCapabilities caps
     ) {
-        caps.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 300);
+        caps.setCapability("newCommandTimeout", 300);
 
         if (RuntimeConfig.recordVideo()) {
             caps.setCapability("recordVideo", true);

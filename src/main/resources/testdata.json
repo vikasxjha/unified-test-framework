@@ -1,0 +1,22 @@
+{
+  "users": {
+    "freeUser": {
+      "userId": "free-user-1",
+      "email": "freeuser@example.com",
+      "phone": "+11234567890",
+      "tier": "free"
+    },
+    "premiumUser": {
+      "userId": "premium-user-1",
+      "email": "premiumuser@example.com",
+      "phone": "+11234567891",
+      "tier": "premium"
+    }
+  },
+  "testEndpoints": {
+    "auth": "/auth",
+    "search": "/search",
+    "lookup": "/lookup"
+  }
+}
+

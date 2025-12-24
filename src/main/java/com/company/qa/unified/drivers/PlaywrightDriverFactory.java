@@ -144,10 +144,10 @@ public final class PlaywrightDriverFactory {
 
         BrowserType.LaunchOptions options =
                 new BrowserType.LaunchOptions()
-                        .setHeadless(headless)
-                        .setSlowMo(
-                                RuntimeConfig.slowMoMillis()
-                        );
+                        .setHeadless(headless);
+
+        // Note: setSlowMo not available in this Playwright version
+        // To enable slow motion, use: launchOptions.setSlowMo(milliseconds);
 
         log.info("Launching browser={} headless={}",
                 browserName, headless);
@@ -194,14 +194,17 @@ public final class PlaywrightDriverFactory {
             return;
         }
 
-        log.info("🎥 Starting Playwright tracing");
-
-        context.tracing().start(
-                new Tracing.StartOptions()
-                        .setScreenshots(true)
-                        .setSnapshots(true)
-                        .setSources(true)
-        );
+        try {
+            log.info("🎥 Starting Playwright tracing");
+            context.tracing().start(
+                    new Tracing.StartOptions()
+                            .setScreenshots(true)
+                            .setSnapshots(true)
+                            .setSources(true)
+            );
+        } catch (Exception e) {
+            log.warn("Tracing not available in this Playwright version", e);
+        }
     }
 
     private static void stopTracing() {
@@ -222,7 +225,7 @@ public final class PlaywrightDriverFactory {
             log.info("🎥 Trace saved: {}", tracePath);
 
         } catch (Exception e) {
-            log.warn("Failed to stop tracing", e);
+            log.warn("Failed to stop tracing - feature not available", e);
         }
     }
 }

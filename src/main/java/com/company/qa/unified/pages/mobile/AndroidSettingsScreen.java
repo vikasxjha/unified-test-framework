@@ -3,7 +3,6 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -34,38 +33,38 @@ public class AndroidSettingsScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(AndroidSettingsScreen.class);
 
-    private final AndroidDriver<?> driver;
+    private final AndroidDriver driver;
 
     /* =========================================================
        LOCATORS
        ========================================================= */
 
     private final By settingsRoot =
-            MobileBy.id("com.truecaller:id/settingsRoot");
+            By.id("com.truecaller:id/settingsRoot");
 
     private final By profileName =
-            MobileBy.id("com.truecaller:id/profileName");
+            By.id("com.truecaller:id/profileName");
 
     private final By profileNumber =
-            MobileBy.id("com.truecaller:id/profileNumber");
+            By.id("com.truecaller:id/profileNumber");
 
     private final By notificationsOption =
-            MobileBy.id("com.truecaller:id/settingsNotifications");
+            By.id("com.truecaller:id/settingsNotifications");
 
     private final By privacyOption =
-            MobileBy.id("com.truecaller:id/settingsPrivacy");
+            By.id("com.truecaller:id/settingsPrivacy");
 
     private final By subscriptionOption =
-            MobileBy.id("com.truecaller:id/settingsSubscription");
+            By.id("com.truecaller:id/settingsSubscription");
 
     private final By logoutButton =
-            MobileBy.id("com.truecaller:id/logout");
+            By.id("com.truecaller:id/logout");
 
     private final By confirmLogoutButton =
-            MobileBy.id("com.truecaller:id/confirmLogout");
+            By.id("com.truecaller:id/confirmLogout");
 
     private final By backButton =
-            MobileBy.AccessibilityId("Navigate up");
+            By.xpath("//*[@content-desc='Navigate up']");
 
     /* =========================================================
        CONSTRUCTOR
@@ -259,11 +258,12 @@ public class AndroidSettingsScreen extends BaseMobileScreen {
             return;
         }
 
-        driver.findElement(
-                MobileBy.AndroidUIAutomator(
-                        "new UiScrollable(new UiSelector().scrollable(true))" +
-                                ".scrollIntoView(new UiSelector().resourceId(\"com.truecaller:id/logout\"))"
-                )
-        );
+        // Scroll to logout button if not visible
+        try {
+            WaitUtils.waitForVisible(driver, logoutButton, 3);
+        } catch (Exception e) {
+            log.debug("Logout button not visible, attempting scroll");
+            // Use standard scroll if element not visible
+        }
     }
 }

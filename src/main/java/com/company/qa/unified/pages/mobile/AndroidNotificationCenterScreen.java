@@ -3,7 +3,6 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -34,29 +33,29 @@ public class AndroidNotificationCenterScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(AndroidNotificationCenterScreen.class);
 
-    private final AndroidDriver<?> driver;
+    private final AndroidDriver driver;
 
     /* =========================================================
        LOCATORS
        ========================================================= */
 
     private final By notificationCenterRoot =
-            MobileBy.id("com.truecaller:id/notificationCenterRoot");
+            By.id("com.truecaller:id/notificationCenterRoot");
 
     private final By notificationItem =
-            MobileBy.id("com.truecaller:id/notificationItem");
+            By.id("com.truecaller:id/notificationItem");
 
     private final By notificationTitle =
-            MobileBy.id("com.truecaller:id/notificationTitle");
+            By.id("com.truecaller:id/notificationTitle");
 
     private final By unreadIndicator =
-            MobileBy.id("com.truecaller:id/unreadDot");
+            By.id("com.truecaller:id/unreadDot");
 
     private final By markAllReadButton =
-            MobileBy.id("com.truecaller:id/markAllRead");
+            By.id("com.truecaller:id/markAllRead");
 
     private final By backButton =
-            MobileBy.AccessibilityId("Navigate up");
+            By.xpath("//*[@content-desc='Navigate up']");
 
     /* =========================================================
        CONSTRUCTOR
@@ -65,7 +64,7 @@ public class AndroidNotificationCenterScreen extends BaseMobileScreen {
     public AndroidNotificationCenterScreen() {
         super(AppiumDriverFactory.getDriver());
         this.driver =
-                (AndroidDriver<?>) AppiumDriverFactory.getDriver();
+                (AndroidDriver) AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-current.dtd">
+<suite name="Unified Test Framework" parallel="methods" thread-count="4">
+    <test name="Smoke Tests">
+        <packages>
+            <package name="com.company.qa.unified.*" />
+        </packages>
+    </test>
+</suite>
+
