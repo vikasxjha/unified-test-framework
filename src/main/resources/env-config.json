@@ -1,0 +1,6 @@
+{
+  "QA": {
+    "webBaseUrl": "https://example.com",
+    "apiBaseUrl": "https://api.example.com"
+  }
+}
