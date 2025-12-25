@@ -178,13 +178,14 @@ public class WebActions {
        SCREENSHOTS
        ========================================================= */
 
-    public Path takeScreenshot(String name) {
+    public byte[] takeScreenshot(String name) {
         log.info("📸 Taking screenshot: {}", name);
-        return page.screenshot(
+        byte[] screenshot = page.screenshot(
                 new Page.ScreenshotOptions()
                         .setPath(Path.of("reports/screenshots/" + name + ".png"))
                         .setFullPage(true)
         );
+        return screenshot;
     }
 
     /* =========================================================

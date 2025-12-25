@@ -79,5 +79,66 @@ public final class JsonUtils {
             throw new RuntimeException("Failed to pretty-print JSON", e);
         }
     }
+
+    /**
+     * Alias for prettyPrint.
+     */
+    public static String pretty(String json) {
+        return prettyPrint(json);
+    }
+
+    /**
+     * Convert object to pretty JSON.
+     */
+    public static String toPrettyJson(Object obj) {
+        try {
+            return MAPPER.writerWithDefaultPrettyPrinter()
+                    .writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize to pretty JSON", e);
+        }
+    }
+
+    /**
+     * Read JSON value from string using JSON path.
+     */
+    public static String read(String json, String path) {
+        try {
+            Map<String, Object> map = toMap(json);
+            Object value = map.get(path);
+            return value != null ? value.toString() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Count occurrences in JSON (simple implementation).
+     */
+    public static int count(String json, String field) {
+        try {
+            String fieldPattern = "\"" + field + "\"";
+            int count = 0;
+            int index = 0;
+            while ((index = json.indexOf(fieldPattern, index)) != -1) {
+                count++;
+                index += fieldPattern.length();
+            }
+            return count;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Parse InputStream to object.
+     */
+    public static <T> T fromJson(java.io.InputStream inputStream, Class<T> clazz) {
+        try {
+            return MAPPER.readValue(inputStream, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse JSON from InputStream", e);
+        }
+    }
 }
 

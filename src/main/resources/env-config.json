@@ -1,6 +1,59 @@
 {
   "QA": {
-    "webBaseUrl": "https://example.com",
-    "apiBaseUrl": "https://api.example.com"
+    "webBaseUrl": "https://www.google.com",
+    "apiBaseUrl": "https://jsonplaceholder.typicode.com",
+    "testUser": "test@example.com",
+    "testPassword": "TestPassword123!",
+    "kafka": {
+      "bootstrapServers": "localhost:9092"
+    },
+    "db": {
+      "url": "jdbc:postgresql://localhost:5432/testdb",
+      "user": "testuser",
+      "password": "testpass"
+    },
+    "metrics": {
+      "endpoint": "http://localhost:9090"
+    },
+    "chaos": {
+      "endpoint": "http://localhost:8080"
+    },
+    "featureFlags": {
+      "new_search": true,
+      "premium_checkout": true,
+      "mobile_notifications": true
+    },
+    "credentials": {
+      "admin_user": "admin@example.com",
+      "admin_password": "Admin123!"
+    }
+  },
+  "STAGING": {
+    "webBaseUrl": "https://staging.example.com",
+    "apiBaseUrl": "https://api.staging.example.com",
+    "testUser": "staging.test@example.com",
+    "testPassword": "StagingPass123!",
+    "kafka": {
+      "bootstrapServers": "kafka.staging.example.com:9092"
+    },
+    "featureFlags": {
+      "new_search": true,
+      "premium_checkout": false,
+      "mobile_notifications": true
+    }
+  },
+  "PROD": {
+    "webBaseUrl": "https://www.example.com",
+    "apiBaseUrl": "https://api.example.com",
+    "testUser": "prod.readonly@example.com",
+    "testPassword": "${PROD_PASSWORD}",
+    "kafka": {
+      "bootstrapServers": "kafka.example.com:9092"
+    },
+    "featureFlags": {
+      "new_search": true,
+      "premium_checkout": true,
+      "mobile_notifications": true
+    }
   }
 }

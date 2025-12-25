@@ -84,6 +84,41 @@ public final class RuntimeConfig {
         return getBoolean(RECORD_TRACE, false);
     }
 
+    /**
+     * Get headless mode.
+     */
+    public static boolean headless() {
+        return isHeadless();
+    }
+
+    /**
+     * Check if tracing is enabled.
+     */
+    public static boolean enableTracing() {
+        return recordTrace();
+    }
+
+    /**
+     * Get UI timeout in seconds.
+     */
+    public static int uiTimeoutSeconds() {
+        return getInt("uiTimeout", 30);
+    }
+
+    /**
+     * Get environment as string.
+     */
+    public static String getEnvironment() {
+        return environment().name();
+    }
+
+    /**
+     * Get browser type.
+     */
+    public static String getBrowser() {
+        return browser();
+    }
+
     /* =========================================================
        TEST EXECUTION
        ========================================================= */

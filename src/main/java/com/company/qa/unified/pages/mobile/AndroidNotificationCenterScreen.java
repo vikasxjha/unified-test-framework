@@ -221,7 +221,7 @@ public class AndroidNotificationCenterScreen extends BaseMobileScreen {
        UTILITIES
        ========================================================= */
 
-    private boolean isElementPresent(By locator, int seconds) {
+    protected boolean isElementPresent(By locator, int seconds) {
         try {
             WaitUtils.waitForVisible(
                     driver,

@@ -45,7 +45,13 @@ public final class ReportPublisher {
         log.info("🧪 STEP: {}", message);
 
         if (ALLURE_AVAILABLE) {
-            Allure.step(message, action);
+            try {
+                Allure.step(message, () -> {
+                    action.run();
+                });
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
         } else {
             action.run();
         }

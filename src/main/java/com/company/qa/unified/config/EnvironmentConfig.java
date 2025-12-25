@@ -207,6 +207,17 @@ public final class EnvironmentConfig {
     }
 
     /**
+     * Get metrics base URL.
+     */
+    public String getMetricsBaseUrl() {
+        String url = getOptional("metrics.endpoint");
+        if (url == null || url.isEmpty()) {
+            return "http://localhost:9090";
+        }
+        return url;
+    }
+
+    /**
      * Simple feature flags wrapper.
      */
     public static class FeatureFlags {
@@ -243,7 +254,7 @@ public final class EnvironmentConfig {
         return value;
     }
 
-    private String getOptional(String key) {
+    protected String getOptional(String key) {
         Object value = resolveNestedKey(key);
         return value == null ? null : value.toString();
     }
