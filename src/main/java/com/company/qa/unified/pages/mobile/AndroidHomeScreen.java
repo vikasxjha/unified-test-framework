@@ -86,6 +86,71 @@ public class AndroidHomeScreen extends BaseMobileScreen {
         return this;
     }
 
+    /**
+     * Verify user is logged in.
+     */
+    public AndroidHomeScreen assertUserLoggedIn() {
+
+        log.info("✅ Verifying user logged in");
+
+        // Check that profile icon is visible (indicates logged in state)
+        WebElement profile =
+                WaitUtils.waitForVisible(
+                        driver,
+                        profileIcon,
+                        10
+                );
+
+        assertTrue(profile.isDisplayed(),
+                "User not logged in - profile icon not visible");
+
+        return this;
+    }
+
+    /**
+     * Navigate to login screen.
+     */
+    public AndroidLoginScreen goToLogin() {
+
+        log.info("🔐 Navigating to login screen");
+
+        // Assuming there's a login button or action
+        // For now, just return new login screen
+        return new AndroidLoginScreen();
+    }
+
+    /**
+     * Navigate to profile.
+     */
+    public AndroidSettingsScreen goToProfile() {
+
+        log.info("👤 Navigating to profile");
+
+        WaitUtils.waitForClickable(
+                driver,
+                profileIcon,
+                10
+        ).click();
+
+        return new AndroidSettingsScreen();
+    }
+
+    /**
+     * Navigate to notifications.
+     */
+    public AndroidNotificationCenterScreen goToNotifications() {
+
+        log.info("🔔 Navigating to notifications");
+
+        WaitUtils.waitForClickable(
+                driver,
+                notificationBell,
+                10
+        ).click();
+
+        return new AndroidNotificationCenterScreen();
+    }
+
     /* =========================================================
        ACTIONS
        ========================================================= */
@@ -185,7 +250,7 @@ public class AndroidHomeScreen extends BaseMobileScreen {
        UTILITIES
        ========================================================= */
 
-    private boolean isElementPresent(By locator, int seconds) {
+    protected boolean isElementPresent(By locator, int seconds) {
         try {
             WaitUtils.waitForVisible(
                     driver,

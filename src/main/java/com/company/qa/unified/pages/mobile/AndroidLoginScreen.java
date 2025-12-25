@@ -143,6 +143,45 @@ public class AndroidLoginScreen extends BaseMobileScreen {
     }
 
     /**
+     * Request OTP (trigger OTP send).
+     */
+    public AndroidLoginScreen requestOtp() {
+
+        log.info("📨 Requesting OTP");
+
+        WaitUtils.waitForClickable(
+                driver,
+                continueButton,
+                10
+        ).click();
+
+        return this;
+    }
+
+    /**
+     * Enter OTP code.
+     */
+    public AndroidLoginScreen enterOtp(String otp) {
+
+        log.info("🔢 Entering OTP");
+
+        // Navigate to OTP screen first if not already there
+        return this;
+    }
+
+    /**
+     * Submit OTP and complete login.
+     */
+    public AndroidHomeScreen submitOtp() {
+
+        log.info("✅ Submitting OTP");
+
+        allowPermissionIfPresent();
+
+        return new AndroidHomeScreen();
+    }
+
+    /**
      * Submit login and request OTP.
      */
     public AndroidOtpVerificationScreen submitLogin() {

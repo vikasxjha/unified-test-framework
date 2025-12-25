@@ -175,6 +175,60 @@ public final class EnvironmentConfig {
         return Collections.emptyMap();
     }
 
+    /**
+     * Get test user email/username.
+     */
+    public String getTestUser() {
+        String user = getOptional("testUser");
+        if (user == null || user.isEmpty()) {
+            // Return default test user
+            return "test@example.com";
+        }
+        return user;
+    }
+
+    /**
+     * Get test user password.
+     */
+    public String getTestPassword() {
+        String password = getOptional("testPassword");
+        if (password == null || password.isEmpty()) {
+            // Return default test password
+            return "TestPassword123!";
+        }
+        return password;
+    }
+
+    /**
+     * Get feature flags config.
+     */
+    public FeatureFlags getFeatureFlags() {
+        return new FeatureFlags(envConfig);
+    }
+
+    /**
+     * Simple feature flags wrapper.
+     */
+    public static class FeatureFlags {
+        private final Map<String, Object> config;
+
+        @SuppressWarnings("unchecked")
+        public FeatureFlags(Map<String, Object> config) {
+            this.config = config;
+        }
+
+        public boolean isEnabled(String flagName) {
+            Object flags = config.get("featureFlags");
+            if (flags instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> flagsMap = (Map<String, Object>) flags;
+                Object value = flagsMap.get(flagName);
+                return Boolean.TRUE.equals(value);
+            }
+            return false;
+        }
+    }
+
     /* =========================================================
        INTERNAL HELPERS
        ========================================================= */
