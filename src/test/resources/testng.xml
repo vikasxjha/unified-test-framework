@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Unified Automation Test Suite"
+       verbose="1"
+       parallel="tests"
+       thread-count="4">
+
+    <!-- =====================================================
+         GLOBAL PARAMETERS
+         These can be overridden via:
+         mvn test -Denv=qa -Dbrowser=chromium
+         ===================================================== -->
+
+    <parameter name="env" value="qa"/>
+    <parameter name="platform" value="web"/>
+    <parameter name="browser" value="chromium"/>
+    <parameter name="headless" value="true"/>
+    <parameter name="tracing" value="false"/>
+
+    <!-- =====================================================
+         SMOKE TESTS (FAST, RELEASE-BLOCKING)
+         ===================================================== -->
+    <test name="Smoke Tests">
+        <parameter name="cucumber.filter.tags" value="@smoke"/>
+        <classes>
+            <class name="com.company.qa.unified.runners.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+    <!-- =====================================================
+         WEB REGRESSION
+         ===================================================== -->
+    <test name="Web Regression">
+        <parameter name="platform" value="web"/>
+        <parameter name="cucumber.filter.tags" value="@web and not @smoke"/>
+        <classes>
+            <class name="com.company.qa.unified.runners.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+    <!-- =====================================================
+         API REGRESSION
+         ===================================================== -->
+    <test name="API Regression">
+        <parameter name="platform" value="api"/>
+        <parameter name="cucumber.filter.tags" value="@api and not @smoke"/>
+        <classes>
+            <class name="com.company.qa.unified.runners.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+    <!-- =====================================================
+         MOBILE REGRESSION
+         ===================================================== -->
+    <test name="Mobile Regression">
+        <parameter name="platform" value="mobile"/>
+        <parameter name="cucumber.filter.tags" value="@mobile and not @smoke"/>
+        <classes>
+            <class name="com.company.qa.unified.runners.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+    <!-- =====================================================
+         SECURITY TESTS
+         ===================================================== -->
+    <test name="Security Tests">
+        <parameter name="platform" value="api"/>
+        <parameter name="cucumber.filter.tags" value="@security"/>
+        <classes>
+            <class name="com.company.qa.unified.runners.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+    <!-- =====================================================
+         PERFORMANCE TESTS
+         ===================================================== -->
+    <test name="Performance Tests">
+        <parameter name="platform" value="api"/>
+        <parameter name="cucumber.filter.tags" value="@performance"/>
+        <classes>
+            <class name="com.company.qa.unified.runners.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+    <!-- =====================================================
+         CHAOS / RESILIENCE TESTS
+         ===================================================== -->
+    <test name="Chaos Tests">
+        <parameter name="platform" value="api"/>
+        <parameter name="cucumber.filter.tags" value="@chaos"/>
+        <classes>
+            <class name="com.company.qa.unified.runners.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+</suite>

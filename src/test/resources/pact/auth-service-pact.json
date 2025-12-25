@@ -1,0 +1,173 @@
+{
+  "consumer": {
+    "name": "unified-test-framework"
+  },
+  "provider": {
+    "name": "auth-service"
+  },
+  "interactions": [
+    {
+      "description": "Authenticate user with valid credentials",
+      "providerStates": [
+        {
+          "name": "User exists and credentials are valid"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "username": "test.user@example.com",
+          "password": "Password@123"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store",
+          "Pragma": "no-cache"
+        },
+        "body": {
+          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+          "refreshToken": "def50200abce123456",
+          "expiresIn": 3600,
+          "tokenType": "Bearer",
+          "user": {
+            "id": "user-12345",
+            "email": "test.user@example.com",
+            "roles": [
+              "USER"
+            ],
+            "mfaEnabled": false
+          }
+        }
+      }
+    },
+    {
+      "description": "Authentication fails with invalid credentials",
+      "providerStates": [
+        {
+          "name": "User exists but credentials are invalid"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/login",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "username": "test.user@example.com",
+          "password": "WrongPassword"
+        }
+      },
+      "response": {
+        "status": 401,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "INVALID_CREDENTIALS",
+          "message": "Username or password is incorrect"
+        }
+      }
+    },
+    {
+      "description": "Request MFA challenge for user",
+      "providerStates": [
+        {
+          "name": "User has MFA enabled"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/mfa/challenge",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer valid-access-token"
+        },
+        "body": {
+          "userId": "user-12345"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "challengeId": "mfa-challenge-98765",
+          "deliveryMethod": "SMS",
+          "expiresIn": 300
+        }
+      }
+    },
+    {
+      "description": "Validate MFA code successfully",
+      "providerStates": [
+        {
+          "name": "Valid MFA challenge exists"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/v1/auth/mfa/verify",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "challengeId": "mfa-challenge-98765",
+          "otp": "123456"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "accessToken": "new-access-token-after-mfa",
+          "expiresIn": 3600,
+          "tokenType": "Bearer"
+        }
+      }
+    },
+    {
+      "description": "Validate access token",
+      "providerStates": [
+        {
+          "name": "Valid access token exists"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/auth/validate",
+        "headers": {
+          "Authorization": "Bearer valid-access-token"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "valid": true,
+          "userId": "user-12345",
+          "roles": [
+            "USER"
+          ]
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  }
+}

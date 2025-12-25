@@ -3,7 +3,7 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -31,26 +31,26 @@ public class IosHomeScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(IosHomeScreen.class);
 
-    private final IOSDriver<?> driver;
+    private final IOSDriver driver;
 
     /* =========================================================
        LOCATORS (XCUI)
        ========================================================= */
 
     private final By homeRoot =
-            MobileBy.AccessibilityId("home_root");
+            AppiumBy.accessibilityId("home_root");
 
     private final By searchBox =
-            MobileBy.AccessibilityId("search_input");
+            AppiumBy.accessibilityId("search_input");
 
     private final By notificationBell =
-            MobileBy.AccessibilityId("notifications_button");
+            AppiumBy.accessibilityId("notifications_button");
 
     private final By profileIcon =
-            MobileBy.AccessibilityId("profile_button");
+            AppiumBy.accessibilityId("profile_button");
 
     private final By allowPermissionButton =
-            MobileBy.iOSNsPredicateString(
+            AppiumBy.iOSNsPredicateString(
                     "label == 'Allow' OR label == 'Allow While Using App'"
             );
 
@@ -61,7 +61,7 @@ public class IosHomeScreen extends BaseMobileScreen {
     public IosHomeScreen() {
         super(AppiumDriverFactory.getDriver());
         this.driver =
-                (IOSDriver<?>) AppiumDriverFactory.getDriver();
+                (IOSDriver) AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================

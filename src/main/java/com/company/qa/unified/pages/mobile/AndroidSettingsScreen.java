@@ -73,7 +73,7 @@ public class AndroidSettingsScreen extends BaseMobileScreen {
     public AndroidSettingsScreen() {
         super(AppiumDriverFactory.getDriver());
         this.driver =
-                (AndroidDriver<?>) AppiumDriverFactory.getDriver();
+                (AndroidDriver) AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================

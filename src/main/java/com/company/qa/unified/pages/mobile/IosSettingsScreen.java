@@ -3,7 +3,7 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -33,38 +33,38 @@ public class IosSettingsScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(IosSettingsScreen.class);
 
-    private final IOSDriver<?> driver;
+    private final IOSDriver driver;
 
     /* =========================================================
        LOCATORS (XCUI)
        ========================================================= */
 
     private final By settingsRoot =
-            MobileBy.AccessibilityId("settings_root");
+            AppiumBy.accessibilityId("settings_root");
 
     private final By profileName =
-            MobileBy.AccessibilityId("profile_name");
+            AppiumBy.accessibilityId("profile_name");
 
     private final By profilePhone =
-            MobileBy.AccessibilityId("profile_phone");
+            AppiumBy.accessibilityId("profile_phone");
 
     private final By notificationsOption =
-            MobileBy.AccessibilityId("settings_notifications");
+            AppiumBy.accessibilityId("settings_notifications");
 
     private final By privacyOption =
-            MobileBy.AccessibilityId("settings_privacy");
+            AppiumBy.accessibilityId("settings_privacy");
 
     private final By subscriptionOption =
-            MobileBy.AccessibilityId("settings_subscription");
+            AppiumBy.accessibilityId("settings_subscription");
 
     private final By logoutButton =
-            MobileBy.AccessibilityId("logout_button");
+            AppiumBy.accessibilityId("logout_button");
 
     private final By confirmLogoutButton =
-            MobileBy.AccessibilityId("confirm_logout");
+            AppiumBy.accessibilityId("confirm_logout");
 
     private final By backButton =
-            MobileBy.AccessibilityId("Back");
+            AppiumBy.accessibilityId("Back");
 
     /* =========================================================
        CONSTRUCTOR
@@ -73,7 +73,7 @@ public class IosSettingsScreen extends BaseMobileScreen {
     public IosSettingsScreen() {
         super(AppiumDriverFactory.getDriver());
         this.driver =
-                (IOSDriver<?>) AppiumDriverFactory.getDriver();
+                (IOSDriver) AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================

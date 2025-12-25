@@ -3,7 +3,7 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -31,26 +31,26 @@ public class IosLoginScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(IosLoginScreen.class);
 
-    private final IOSDriver<?> driver;
+    private final IOSDriver driver;
 
     /* =========================================================
        LOCATORS (XCUI)
        ========================================================= */
 
     private final By loginRoot =
-            MobileBy.AccessibilityId("login_root");
+            AppiumBy.accessibilityId("login_root");
 
     private final By countryPicker =
-            MobileBy.AccessibilityId("country_picker");
+            AppiumBy.accessibilityId("country_picker");
 
     private final By phoneInput =
-            MobileBy.AccessibilityId("phone_input");
+            AppiumBy.accessibilityId("phone_input");
 
     private final By continueButton =
-            MobileBy.AccessibilityId("continue_button");
+            AppiumBy.accessibilityId("continue_button");
 
     private final By allowPermissionButton =
-            MobileBy.iOSNsPredicateString(
+            AppiumBy.iOSNsPredicateString(
                     "label == 'Allow' OR label == 'Allow While Using App'"
             );
 
@@ -61,7 +61,7 @@ public class IosLoginScreen extends BaseMobileScreen {
     public IosLoginScreen() {
         super(AppiumDriverFactory.getDriver());
         this.driver =
-                (IOSDriver<?>) AppiumDriverFactory.getDriver();
+                (IOSDriver) AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================

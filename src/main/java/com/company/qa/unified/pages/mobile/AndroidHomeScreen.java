@@ -3,7 +3,6 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
@@ -60,7 +59,7 @@ public class AndroidHomeScreen extends BaseMobileScreen {
 
     public AndroidHomeScreen() {
         super(AppiumDriverFactory.getDriver());
-        this.driver = (AndroidDriver<?>) AppiumDriverFactory.getDriver();
+        this.driver = (AndroidDriver) AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================

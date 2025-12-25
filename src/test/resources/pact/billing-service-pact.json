@@ -1,0 +1,188 @@
+{
+  "consumer": {
+    "name": "unified-test-framework"
+  },
+  "provider": {
+    "name": "billing-service"
+  },
+  "interactions": [
+    {
+      "description": "Fetch available subscription plans",
+      "providerStates": [
+        {
+          "name": "Subscription plans exist"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/billing/plans",
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store"
+        },
+        "body": {
+          "plans": [
+            {
+              "planId": "premium_monthly",
+              "name": "Premium Monthly",
+              "price": 99.0,
+              "currency": "INR",
+              "billingCycle": "MONTHLY",
+              "features": [
+                "AD_FREE",
+                "SPAM_BLOCKING",
+                "WHO_VIEWED_MY_PROFILE"
+              ]
+            },
+            {
+              "planId": "premium_yearly",
+              "name": "Premium Yearly",
+              "price": 999.0,
+              "currency": "INR",
+              "billingCycle": "YEARLY",
+              "features": [
+                "AD_FREE",
+                "SPAM_BLOCKING",
+                "WHO_VIEWED_MY_PROFILE",
+                "PRIORITY_SUPPORT"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "description": "Create checkout session for subscription purchase",
+      "providerStates": [
+        {
+          "name": "User is eligible for subscription"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/v1/billing/checkout",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer valid-access-token"
+        },
+        "body": {
+          "userId": "user-12345",
+          "planId": "premium_monthly",
+          "paymentMethod": "CARD"
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "checkoutId": "chk-987654",
+          "paymentUrl": "https://payments.example.com/pay/chk-987654",
+          "expiresIn": 900
+        }
+      }
+    },
+    {
+      "description": "Payment completed successfully",
+      "providerStates": [
+        {
+          "name": "Checkout session exists"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/v1/billing/payment/confirm",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "checkoutId": "chk-987654",
+          "paymentStatus": "SUCCESS",
+          "transactionId": "txn-555666"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "subscriptionId": "sub-123456",
+          "status": "ACTIVE",
+          "activatedAt": "2025-01-01T10:00:00Z",
+          "validUntil": "2025-02-01T10:00:00Z"
+        }
+      }
+    },
+    {
+      "description": "Payment fails during checkout",
+      "providerStates": [
+        {
+          "name": "Checkout session exists"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "path": "/v1/billing/payment/confirm",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "checkoutId": "chk-987654",
+          "paymentStatus": "FAILED",
+          "transactionId": "txn-999888"
+        }
+      },
+      "response": {
+        "status": 402,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "PAYMENT_FAILED",
+          "message": "Payment could not be processed"
+        }
+      }
+    },
+    {
+      "description": "Fetch active subscription for user",
+      "providerStates": [
+        {
+          "name": "User has an active subscription"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/billing/subscriptions/user-12345",
+        "headers": {
+          "Authorization": "Bearer valid-access-token"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "subscriptionId": "sub-123456",
+          "planId": "premium_monthly",
+          "status": "ACTIVE",
+          "autoRenew": true,
+          "validUntil": "2025-02-01T10:00:00Z"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  }
+}

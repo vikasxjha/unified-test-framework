@@ -3,7 +3,7 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.MobileBy;
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -34,33 +34,33 @@ public class IosNotificationCenterScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(IosNotificationCenterScreen.class);
 
-    private final IOSDriver<?> driver;
+    private final IOSDriver driver;
 
     /* =========================================================
        LOCATORS (XCUI)
        ========================================================= */
 
     private final By notificationCenterRoot =
-            MobileBy.AccessibilityId("notification_center_root");
+            AppiumBy.accessibilityId("notification_center_root");
 
     private final By notificationCell =
-            MobileBy.iOSClassChain("**/XCUIElementTypeCell");
+            AppiumBy.iOSClassChain("**/XCUIElementTypeCell");
 
     private final By notificationTitle =
-            MobileBy.iOSClassChain(
+            AppiumBy.iOSClassChain(
                     "**/XCUIElementTypeCell/**/XCUIElementTypeStaticText"
             );
 
     private final By unreadIndicator =
-            MobileBy.iOSNsPredicateString(
+            AppiumBy.iOSNsPredicateString(
                     "name CONTAINS 'unread' OR label CONTAINS 'unread'"
             );
 
     private final By markAllReadButton =
-            MobileBy.AccessibilityId("mark_all_read");
+            AppiumBy.accessibilityId("mark_all_read");
 
     private final By backButton =
-            MobileBy.AccessibilityId("Back");
+            AppiumBy.accessibilityId("Back");
 
     /* =========================================================
        CONSTRUCTOR
@@ -69,7 +69,7 @@ public class IosNotificationCenterScreen extends BaseMobileScreen {
     public IosNotificationCenterScreen() {
         super(AppiumDriverFactory.getDriver());
         this.driver =
-                (IOSDriver<?>) AppiumDriverFactory.getDriver();
+                (IOSDriver) AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================

@@ -1,0 +1,186 @@
+{
+  "consumer": {
+    "name": "unified-test-framework"
+  },
+  "provider": {
+    "name": "lookup-service"
+  },
+  "interactions": [
+    {
+      "description": "Lookup a phone number with known identity",
+      "providerStates": [
+        {
+          "name": "Phone number exists with profile data"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/lookup",
+        "query": {
+          "phone": "919999999999"
+        },
+        "headers": {
+          "Authorization": "Bearer valid-access-token",
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store"
+        },
+        "body": {
+          "phone": "919999999999",
+          "name": "Test User",
+          "spamScore": 0.02,
+          "spamType": "NONE",
+          "isSpam": false,
+          "countryCode": "IN",
+          "carrier": "Airtel",
+          "tags": [
+            "BUSINESS"
+          ],
+          "confidence": 0.98
+        }
+      }
+    },
+    {
+      "description": "Lookup a phone number marked as spam",
+      "providerStates": [
+        {
+          "name": "Phone number exists and is marked as spam"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/lookup",
+        "query": {
+          "phone": "918888888888"
+        },
+        "headers": {
+          "Authorization": "Bearer valid-access-token",
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "phone": "918888888888",
+          "name": "Spam Caller",
+          "spamScore": 0.92,
+          "spamType": "SCAM",
+          "isSpam": true,
+          "countryCode": "IN",
+          "carrier": "Unknown",
+          "tags": [
+            "SCAM",
+            "FRAUD"
+          ],
+          "confidence": 0.91
+        }
+      }
+    },
+    {
+      "description": "Lookup a phone number with no available data",
+      "providerStates": [
+        {
+          "name": "Phone number exists but has no profile"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/lookup",
+        "query": {
+          "phone": "917777777777"
+        },
+        "headers": {
+          "Authorization": "Bearer valid-access-token",
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "phone": "917777777777",
+          "name": null,
+          "spamScore": 0.10,
+          "spamType": "UNKNOWN",
+          "isSpam": false,
+          "countryCode": "IN",
+          "carrier": "Vodafone",
+          "tags": [],
+          "confidence": 0.40
+        }
+      }
+    },
+    {
+      "description": "Lookup request without authentication",
+      "providerStates": [
+        {
+          "name": "Authentication token is missing"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/lookup",
+        "query": {
+          "phone": "919999999999"
+        },
+        "headers": {
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 401,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "UNAUTHORIZED",
+          "message": "Authentication token is required"
+        }
+      }
+    },
+    {
+      "description": "Lookup request with invalid phone number format",
+      "providerStates": [
+        {
+          "name": "Invalid phone number format"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "path": "/v1/lookup",
+        "query": {
+          "phone": "abcd123"
+        },
+        "headers": {
+          "Authorization": "Bearer valid-access-token",
+          "Accept": "application/json"
+        }
+      },
+      "response": {
+        "status": 400,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "error": "INVALID_PHONE_NUMBER",
+          "message": "Phone number format is invalid"
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "3.0.0"
+    }
+  }
+}

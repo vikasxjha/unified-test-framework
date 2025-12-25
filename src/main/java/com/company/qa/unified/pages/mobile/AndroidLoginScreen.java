@@ -3,7 +3,6 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
 import io.appium.java_client.android.nativekey.KeyEvent;
@@ -32,26 +31,26 @@ public class AndroidLoginScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(AndroidLoginScreen.class);
 
-    private final AndroidDriver<?> driver;
+    private final AndroidDriver driver;
 
     /* =========================================================
        LOCATORS
        ========================================================= */
 
     private final By phoneInput =
-            MobileBy.id("com.truecaller:id/phoneNumber");
+            By.id("com.truecaller:id/phoneNumber");
 
     private final By continueButton =
-            MobileBy.id("com.truecaller:id/continueButton");
+            By.id("com.truecaller:id/continueButton");
 
     private final By countryPicker =
-            MobileBy.id("com.truecaller:id/countryPicker");
+            By.id("com.truecaller:id/countryPicker");
 
     private final By loginRoot =
-            MobileBy.id("com.truecaller:id/loginRoot");
+            By.id("com.truecaller:id/loginRoot");
 
     private final By permissionAllowButton =
-            MobileBy.id("com.android.permissioncontroller:id/permission_allow_button");
+            By.id("com.android.permissioncontroller:id/permission_allow_button");
 
     /* =========================================================
        CONSTRUCTOR
@@ -59,7 +58,7 @@ public class AndroidLoginScreen extends BaseMobileScreen {
 
     public AndroidLoginScreen() {
         super(AppiumDriverFactory.getDriver());
-        this.driver = (AndroidDriver<?>) AppiumDriverFactory.getDriver();
+        this.driver = (AndroidDriver) AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================
@@ -104,7 +103,7 @@ public class AndroidLoginScreen extends BaseMobileScreen {
         ).click();
 
         By country =
-                MobileBy.xpath(
+                By.xpath(
                         "//*[@text='" + countryName + "']"
                 );
 

@@ -3,12 +3,9 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.TouchAction;
-import io.appium.java_client.touch.WaitOptions;
-import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.*;
 
-import java.time.Duration;
+import java.util.Map;
 
 /**
  * BaseMobileScreen
@@ -28,10 +25,10 @@ import java.time.Duration;
  */
 public abstract class BaseMobileScreen {
 
-    protected final AppiumDriver<?> driver;
+    protected final AppiumDriver driver;
     protected final Log log;
 
-    protected BaseMobileScreen(AppiumDriver<?> driver) {
+    protected BaseMobileScreen(AppiumDriver driver) {
         this.driver = driver;
         this.log = Log.get(this.getClass());
     }
@@ -86,18 +83,20 @@ public abstract class BaseMobileScreen {
 
         Dimension size = driver.manage().window().getSize();
 
-        int x = size.width / 2;
         int startY = (int) (size.height * startRatio);
         int endY = (int) (size.height * endRatio);
 
         log.debug("📲 Swipe vertical from {} to {}", startY, endY);
 
-        new TouchAction<>(driver)
-                .press(PointOption.point(x, startY))
-                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(500)))
-                .moveTo(PointOption.point(x, endY))
-                .release()
-                .perform();
+        // Modern Appium 9.1.0+ gesture API using mobile: swipe
+        try {
+            driver.executeScript("mobile: swipe", Map.of(
+                    "direction", startY > endY ? "up" : "down",
+                    "percent", Math.abs(endRatio - startRatio)
+            ));
+        } catch (Exception e) {
+            log.warn("Swipe gesture failed: {}", e.getMessage());
+        }
     }
 
     /**
@@ -121,9 +120,14 @@ public abstract class BaseMobileScreen {
 
         log.debug("📍 Tapping at coordinates x={} y={}", x, y);
 
-        new TouchAction<>(driver)
-                .tap(PointOption.point(x, y))
-                .perform();
+        try {
+            driver.executeScript("mobile: tap", Map.of(
+                    "x", x,
+                    "y", y
+            ));
+        } catch (Exception e) {
+            log.warn("Tap gesture failed: {}", e.getMessage());
+        }
     }
 
     /* =========================================================
@@ -151,8 +155,11 @@ public abstract class BaseMobileScreen {
 
     protected void hideKeyboard() {
         try {
-            driver.hideKeyboard();
+            // Modern Appium 9.1.0+ API
+            // Use executeScript to dismiss keyboard on iOS/Android
+            driver.executeScript("mobile: dismissKeyboard");
         } catch (Exception ignored) {
+            // Keyboard may not be open or not supported
         }
     }
 
