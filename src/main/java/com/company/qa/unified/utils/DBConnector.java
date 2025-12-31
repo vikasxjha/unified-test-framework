@@ -1,38 +1,43 @@
 package com.company.qa.unified.utils;
 
 import com.company.qa.unified.config.EnvironmentConfig;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Database connector for test data provisioning.
+ * Database connector with HikariCP connection pooling for test data provisioning.
  *
- * Handles:
- * - Direct JDBC connections to test databases
+ * Features:
+ * - Production-grade connection pooling via HikariCP
+ * - Automatic connection validation and health checks
  * - Parameterized queries to prevent SQL injection
- * - Connection pooling and cleanup
+ * - Thread-safe connection management
+ * - Configurable pool size and connection timeouts
  *
- * NOTE: This is a simplified implementation for testing.
- * Production systems should use connection pools (HikariCP, etc).
+ * Configuration via system properties:
+ * - db.url: JDBC connection URL
+ * - db.user: Database username
+ * - db.password: Database password
+ * - db.pool.size: Maximum pool size (default: 10)
+ * - db.pool.timeout: Connection timeout in ms (default: 30000)
  *
  * Usage:
- *   DBConnector.execute("INSERT INTO users ...", params);
- *   List<Map<String, Object>> rows = DBConnector.query("SELECT * FROM users");
+ *   DBConnector.execute("INSERT INTO users (email, name) VALUES (?, ?)", email, name);
+ *   List<Map<String, Object>> rows = DBConnector.query("SELECT * FROM users WHERE email = ?", email);
+ *   Map<String, Object> user = DBConnector.queryOne("SELECT * FROM users WHERE id = ?", userId);
+ *   Integer count = (Integer) DBConnector.queryValue("SELECT COUNT(*) FROM users");
  */
 public final class DBConnector {
 
     private static final Log log = Log.get(DBConnector.class);
 
-    private static final ThreadLocal<Connection> CONNECTION = new ThreadLocal<>();
+    private static HikariDataSource dataSource;
 
     private static final String DB_URL = System.getProperty(
             "db.url",
@@ -48,6 +53,18 @@ public final class DBConnector {
             "db.password",
             "testpass"
     );
+
+    private static final int POOL_SIZE = Integer.parseInt(
+            System.getProperty("db.pool.size", "10")
+    );
+
+    private static final int CONNECTION_TIMEOUT = Integer.parseInt(
+            System.getProperty("db.pool.timeout", "30000")
+    );
+
+    static {
+        initializeConnectionPool();
+    }
 
     private DBConnector() {
         // utility
@@ -68,6 +85,44 @@ public final class DBConnector {
     }
 
     /**
+     * Initialize HikariCP connection pool.
+     */
+    private static void initializeConnectionPool() {
+        try {
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(DB_URL);
+            config.setUsername(DB_USER);
+            config.setPassword(DB_PASSWORD);
+
+            // Connection pool settings
+            config.setMaximumPoolSize(POOL_SIZE);
+            config.setMinimumIdle(2);
+            config.setConnectionTimeout(CONNECTION_TIMEOUT);
+            config.setIdleTimeout(600000); // 10 minutes
+            config.setMaxLifetime(1800000); // 30 minutes
+
+            // Performance optimizations
+            config.setAutoCommit(false);
+            config.setConnectionTestQuery("SELECT 1");
+
+            // Pool name for monitoring
+            config.setPoolName("TestFrameworkPool");
+
+            // Connection validation
+            config.setValidationTimeout(5000);
+            config.setLeakDetectionThreshold(60000); // 1 minute
+
+            dataSource = new HikariDataSource(config);
+
+            log.info("HikariCP connection pool initialized: URL={}, MaxPoolSize={}", DB_URL, POOL_SIZE);
+
+        } catch (Exception e) {
+            log.error("Failed to initialize HikariCP connection pool", e);
+            throw new RuntimeException("Database connection pool initialization failed", e);
+        }
+    }
+
+    /**
      * Execute a SQL statement with parameters.
      * Auto-commits after execution.
      *
@@ -76,9 +131,8 @@ public final class DBConnector {
      * @return number of rows affected
      */
     public static int execute(String sql, Object... params) {
-        try {
-            Connection conn = getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             for (int i = 0; i < params.length; i++) {
                 stmt.setObject(i + 1, params[i]);
@@ -104,9 +158,8 @@ public final class DBConnector {
      * @return list of row maps
      */
     public static List<Map<String, Object>> query(String sql, Object... params) {
-        try {
-            Connection conn = getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql);
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             for (int i = 0; i < params.length; i++) {
                 stmt.setObject(i + 1, params[i]);
@@ -165,48 +218,32 @@ public final class DBConnector {
     }
 
     /**
-     * Get or create a thread-local database connection.
+     * Shutdown the HikariCP connection pool.
+     * Should be called during application shutdown or test cleanup.
      */
-    private static Connection getConnection() throws SQLException {
-        Connection conn = CONNECTION.get();
-        if (conn == null || conn.isClosed()) {
-            conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-            conn.setAutoCommit(false);
-            CONNECTION.set(conn);
-            log.debug("Created new database connection");
-        }
-        return conn;
-    }
-
-    /**
-     * Close and cleanup the thread-local connection.
-     */
-    public static void close() {
-        try {
-            Connection conn = CONNECTION.get();
-            if (conn != null && !conn.isClosed()) {
-                conn.close();
-                CONNECTION.remove();
-                log.debug("Closed database connection");
-            }
-        } catch (SQLException e) {
-            log.warn("Failed to close database connection", e);
+    public static void shutdown() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+            log.info("HikariCP connection pool closed");
         }
     }
 
     /**
-     * Rollback the current transaction.
+     * Get pool statistics for monitoring.
+     *
+     * @return map containing pool metrics
      */
-    public static void rollback() {
-        try {
-            Connection conn = CONNECTION.get();
-            if (conn != null && !conn.isClosed()) {
-                conn.rollback();
-                log.debug("Rolled back transaction");
-            }
-        } catch (SQLException e) {
-            log.warn("Failed to rollback transaction", e);
+    public static Map<String, Object> getPoolStats() {
+        if (dataSource == null) {
+            return Map.of("status", "not_initialized");
         }
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("active", dataSource.getHikariPoolMXBean().getActiveConnections());
+        stats.put("idle", dataSource.getHikariPoolMXBean().getIdleConnections());
+        stats.put("total", dataSource.getHikariPoolMXBean().getTotalConnections());
+        stats.put("waiting", dataSource.getHikariPoolMXBean().getThreadsAwaitingConnection());
+        return stats;
     }
 }
 

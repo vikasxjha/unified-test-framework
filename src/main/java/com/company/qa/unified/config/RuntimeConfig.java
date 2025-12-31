@@ -23,6 +23,19 @@ public final class RuntimeConfig {
     private static final Log log = Log.get(RuntimeConfig.class);
 
     /* =========================================================
+       DEFAULTS (Must be defined first before use)
+       ========================================================= */
+
+    private static final String DEFAULT_BROWSER = "chromium";
+    private static final boolean DEFAULT_HEADLESS = true;
+    private static final boolean DEFAULT_PARALLEL = true;
+    private static final int DEFAULT_THREAD_COUNT = 4;
+    private static final int DEFAULT_SLOW_MO = 0;
+    private static final int DEFAULT_RETRY_COUNT = 1;
+    private static final boolean DEFAULT_NOTIFICATIONS_ENABLED = false;
+    private static final boolean DEFAULT_NOTIFICATIONS_ON_FAILURE = true;
+
+    /* =========================================================
        JVM PROPERTY KEYS
        ========================================================= */
 
@@ -91,19 +104,6 @@ public final class RuntimeConfig {
                     System.getProperty("retryCount",
                             String.valueOf(DEFAULT_RETRY_COUNT))
             );
-
-    /* =========================================================
-       DEFAULTS
-       ========================================================= */
-
-    private static final String DEFAULT_BROWSER = "chromium";
-    private static final boolean DEFAULT_HEADLESS = true;
-    private static final boolean DEFAULT_PARALLEL = true;
-    private static final int DEFAULT_THREAD_COUNT = 4;
-    private static final int DEFAULT_SLOW_MO = 0;
-    private static final int DEFAULT_RETRY_COUNT = 1;
-    private static final boolean DEFAULT_NOTIFICATIONS_ENABLED = false;
-    private static final boolean DEFAULT_NOTIFICATIONS_ON_FAILURE = true;
 
     private RuntimeConfig() {
         // utility
