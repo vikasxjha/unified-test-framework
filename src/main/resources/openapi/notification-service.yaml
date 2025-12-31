@@ -1,0 +1,1738 @@
+openapi: 3.0.3
+info:
+  title: Notification Service API
+  description: |
+    Multi-channel notification service supporting:
+    - Push notifications (Mobile & Web)
+    - Email notifications
+    - SMS notifications
+    - In-app notifications
+    - Notification preferences and subscriptions
+    - Template management
+    - Delivery tracking and analytics
+  version: 1.0.0
+  contact:
+    name: QA Team
+    email: qa@company.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: https://api.company.com/notifications/v1
+    description: Production server
+  - url: https://api-staging.company.com/notifications/v1
+    description: Staging server
+  - url: http://localhost:8083/notifications/v1
+    description: Local development server
+
+tags:
+  - name: Notifications
+    description: Send and manage notifications
+  - name: Push
+    description: Push notification operations
+  - name: Email
+    description: Email notification operations
+  - name: SMS
+    description: SMS notification operations
+  - name: In-App
+    description: In-app notification operations
+  - name: Preferences
+    description: User notification preferences
+  - name: Templates
+    description: Notification template management
+  - name: Devices
+    description: Device registration for push notifications
+  - name: Analytics
+    description: Notification delivery analytics
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+paths:
+  /send:
+    post:
+      tags:
+        - Notifications
+      summary: Send notification
+      description: Send a notification through one or more channels
+      operationId: sendNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendNotificationRequest'
+            examples:
+              pushNotification:
+                summary: Send push notification
+                value:
+                  userId: "usr_1a2b3c4d5e6f"
+                  channels: ["push"]
+                  title: "New Message"
+                  body: "You have a new message from John"
+                  data:
+                    messageId: "msg_123"
+                    senderId: "usr_abc"
+                  priority: "high"
+              emailNotification:
+                summary: Send email notification
+                value:
+                  userId: "usr_1a2b3c4d5e6f"
+                  channels: ["email"]
+                  subject: "Welcome to our platform"
+                  body: "<h1>Welcome!</h1><p>Thank you for joining us.</p>"
+                  templateId: "welcome_email"
+              multiChannel:
+                summary: Send multi-channel notification
+                value:
+                  userId: "usr_1a2b3c4d5e6f"
+                  channels: ["push", "email", "in_app"]
+                  title: "Payment Received"
+                  body: "Your payment of $99.99 has been processed"
+                  templateId: "payment_confirmation"
+                  data:
+                    amount: 99.99
+                    transactionId: "txn_xyz123"
+      responses:
+        '200':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+              example:
+                notificationId: "notif_abc123xyz"
+                status: "sent"
+                channels:
+                  push: "delivered"
+                  email: "queued"
+                  in_app: "delivered"
+                timestamp: "2025-12-31T10:00:00Z"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /send/batch:
+    post:
+      tags:
+        - Notifications
+      summary: Send batch notifications
+      description: Send notifications to multiple users
+      operationId: sendBatchNotifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userIds
+                - notification
+              properties:
+                userIds:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 1000
+                  example: ["usr_1", "usr_2", "usr_3"]
+                notification:
+                  $ref: '#/components/schemas/NotificationPayload'
+      responses:
+        '202':
+          description: Batch notification accepted for processing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  batchId:
+                    type: string
+                    example: "batch_abc123"
+                  status:
+                    type: string
+                    example: "processing"
+                  totalRecipients:
+                    type: integer
+                    example: 3
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /push/send:
+    post:
+      tags:
+        - Push
+      summary: Send push notification
+      description: Send a push notification to specific devices or users
+      operationId: sendPushNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PushNotificationRequest'
+            examples:
+              toUser:
+                summary: Send to user (all devices)
+                value:
+                  userId: "usr_1a2b3c4d5e6f"
+                  title: "New Feature Available"
+                  body: "Check out our latest update"
+                  icon: "https://cdn.company.com/icons/notification.png"
+                  badge: 5
+                  sound: "default"
+                  data:
+                    screen: "features"
+                    featureId: "feature_123"
+              toDevice:
+                summary: Send to specific device
+                value:
+                  deviceToken: "fcm_token_abc123xyz"
+                  title: "Reminder"
+                  body: "Don't forget your appointment at 3 PM"
+                  priority: "high"
+                  ttl: 3600
+      responses:
+        '200':
+          description: Push notification sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PushNotificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /email/send:
+    post:
+      tags:
+        - Email
+      summary: Send email notification
+      description: Send an email notification
+      operationId: sendEmailNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailNotificationRequest'
+            examples:
+              simpleEmail:
+                summary: Simple text email
+                value:
+                  to: "user@example.com"
+                  subject: "Welcome to Company"
+                  body: "Thank you for signing up!"
+                  from: "noreply@company.com"
+              htmlEmail:
+                summary: HTML email with template
+                value:
+                  to: "user@example.com"
+                  subject: "Your Order Confirmation"
+                  templateId: "order_confirmation"
+                  variables:
+                    orderNumber: "ORD-12345"
+                    total: "$99.99"
+                    items: ["Product A", "Product B"]
+                  from: "orders@company.com"
+              emailWithAttachments:
+                summary: Email with attachments
+                value:
+                  to: "user@example.com"
+                  subject: "Your Invoice"
+                  body: "Please find your invoice attached"
+                  attachments:
+                    - filename: "invoice.pdf"
+                      contentType: "application/pdf"
+                      url: "https://cdn.company.com/invoices/123.pdf"
+      responses:
+        '200':
+          description: Email sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailNotificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /sms/send:
+    post:
+      tags:
+        - SMS
+      summary: Send SMS notification
+      description: Send an SMS notification
+      operationId: sendSmsNotification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsNotificationRequest'
+            examples:
+              simpleSms:
+                summary: Simple SMS
+                value:
+                  phoneNumber: "+1234567890"
+                  message: "Your verification code is: 123456"
+              templateSms:
+                summary: SMS with template
+                value:
+                  phoneNumber: "+1234567890"
+                  templateId: "verification_code"
+                  variables:
+                    code: "123456"
+                    expiryMinutes: 5
+      responses:
+        '200':
+          description: SMS sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsNotificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /in-app:
+    get:
+      tags:
+        - In-App
+      summary: Get in-app notifications
+      description: Retrieve in-app notifications for the authenticated user
+      operationId: getInAppNotifications
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [all, unread, read, archived]
+            default: all
+          example: unread
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InAppNotification'
+                  total:
+                    type: integer
+                    example: 42
+                  unreadCount:
+                    type: integer
+                    example: 5
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /in-app/{notificationId}:
+    get:
+      tags:
+        - In-App
+      summary: Get notification by ID
+      description: Retrieve a specific in-app notification
+      operationId: getInAppNotification
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "notif_abc123"
+      responses:
+        '200':
+          description: Notification retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InAppNotification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - In-App
+      summary: Update notification status
+      description: Mark notification as read/unread/archived
+      operationId: updateNotificationStatus
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "notif_abc123"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [read, unread, archived]
+                  example: "read"
+      responses:
+        '200':
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InAppNotification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - In-App
+      summary: Delete notification
+      description: Delete a specific in-app notification
+      operationId: deleteInAppNotification
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "notif_abc123"
+      responses:
+        '204':
+          description: Notification deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /in-app/mark-all-read:
+    post:
+      tags:
+        - In-App
+      summary: Mark all as read
+      description: Mark all in-app notifications as read
+      operationId: markAllNotificationsRead
+      responses:
+        '200':
+          description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "All notifications marked as read"
+                  count:
+                    type: integer
+                    example: 5
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /devices:
+    post:
+      tags:
+        - Devices
+      summary: Register device
+      description: Register a device for push notifications
+      operationId: registerDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceRegistrationRequest'
+            examples:
+              androidDevice:
+                summary: Register Android device
+                value:
+                  deviceToken: "fcm_token_abc123xyz"
+                  platform: "android"
+                  deviceId: "device_123"
+                  deviceName: "Samsung Galaxy S21"
+                  appVersion: "2.1.0"
+              iosDevice:
+                summary: Register iOS device
+                value:
+                  deviceToken: "apns_token_xyz987abc"
+                  platform: "ios"
+                  deviceId: "device_456"
+                  deviceName: "iPhone 13 Pro"
+                  appVersion: "2.1.0"
+      responses:
+        '201':
+          description: Device registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    get:
+      tags:
+        - Devices
+      summary: List user devices
+      description: Get all registered devices for the authenticated user
+      operationId: listDevices
+      responses:
+        '200':
+          description: Devices retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DeviceResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /devices/{deviceId}:
+    delete:
+      tags:
+        - Devices
+      summary: Unregister device
+      description: Remove a device from push notifications
+      operationId: unregisterDevice
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "device_123"
+      responses:
+        '204':
+          description: Device unregistered successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /preferences:
+    get:
+      tags:
+        - Preferences
+      summary: Get notification preferences
+      description: Retrieve notification preferences for the authenticated user
+      operationId: getNotificationPreferences
+      responses:
+        '200':
+          description: Preferences retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    put:
+      tags:
+        - Preferences
+      summary: Update notification preferences
+      description: Update notification preferences for the authenticated user
+      operationId: updateNotificationPreferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPreferences'
+            examples:
+              allEnabled:
+                summary: All notifications enabled
+                value:
+                  channels:
+                    push:
+                      enabled: true
+                    email:
+                      enabled: true
+                    sms:
+                      enabled: true
+                    in_app:
+                      enabled: true
+                  categories:
+                    marketing:
+                      push: false
+                      email: true
+                      sms: false
+                    transactional:
+                      push: true
+                      email: true
+                      sms: true
+                    social:
+                      push: true
+                      email: false
+                      sms: false
+              minimalist:
+                summary: Only essential notifications
+                value:
+                  channels:
+                    push:
+                      enabled: false
+                    email:
+                      enabled: true
+                    sms:
+                      enabled: false
+                    in_app:
+                      enabled: true
+                  categories:
+                    marketing:
+                      push: false
+                      email: false
+                      sms: false
+                    transactional:
+                      push: false
+                      email: true
+                      sms: false
+      responses:
+        '200':
+          description: Preferences updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPreferences'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /templates:
+    get:
+      tags:
+        - Templates
+      summary: List notification templates
+      description: Retrieve all notification templates
+      operationId: listTemplates
+      parameters:
+        - name: channel
+          in: query
+          schema:
+            type: string
+            enum: [push, email, sms, in_app]
+          example: email
+        - name: category
+          in: query
+          schema:
+            type: string
+          example: transactional
+      responses:
+        '200':
+          description: Templates retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  templates:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NotificationTemplate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      tags:
+        - Templates
+      summary: Create notification template
+      description: Create a new notification template
+      operationId: createTemplate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /templates/{templateId}:
+    get:
+      tags:
+        - Templates
+      summary: Get template by ID
+      description: Retrieve a specific notification template
+      operationId: getTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "welcome_email"
+      responses:
+        '200':
+          description: Template retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Templates
+      summary: Update template
+      description: Update an existing notification template
+      operationId: updateTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "welcome_email"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTemplateRequest'
+      responses:
+        '200':
+          description: Template updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Templates
+      summary: Delete template
+      description: Delete a notification template
+      operationId: deleteTemplate
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "welcome_email"
+      responses:
+        '204':
+          description: Template deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /analytics/summary:
+    get:
+      tags:
+        - Analytics
+      summary: Get notification analytics summary
+      description: Retrieve analytics summary for notifications
+      operationId: getAnalyticsSummary
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+          example: "2025-12-01"
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+          example: "2025-12-31"
+        - name: channel
+          in: query
+          schema:
+            type: string
+            enum: [push, email, sms, in_app]
+          example: push
+      responses:
+        '200':
+          description: Analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnalyticsSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /analytics/notifications/{notificationId}:
+    get:
+      tags:
+        - Analytics
+      summary: Get notification delivery status
+      description: Get detailed delivery status for a specific notification
+      operationId: getNotificationStatus
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "notif_abc123"
+      responses:
+        '200':
+          description: Status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token obtained from auth service
+
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key for service-to-service authentication
+
+  schemas:
+    SendNotificationRequest:
+      type: object
+      required:
+        - userId
+        - channels
+      properties:
+        userId:
+          type: string
+          example: "usr_1a2b3c4d5e6f"
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [push, email, sms, in_app]
+          example: ["push", "email"]
+        title:
+          type: string
+          maxLength: 200
+          example: "New Message"
+        body:
+          type: string
+          maxLength: 5000
+          example: "You have a new message from John"
+        subject:
+          type: string
+          maxLength: 200
+          description: Email subject (used when email channel is included)
+          example: "New Message Notification"
+        templateId:
+          type: string
+          example: "new_message"
+        variables:
+          type: object
+          additionalProperties: true
+          example:
+            senderName: "John Doe"
+            messagePreview: "Hey, how are you?"
+        data:
+          type: object
+          additionalProperties: true
+          description: Custom data payload for push notifications
+          example:
+            messageId: "msg_123"
+            conversationId: "conv_456"
+        priority:
+          type: string
+          enum: [low, normal, high]
+          default: normal
+          example: "high"
+        category:
+          type: string
+          enum: [marketing, transactional, social, system]
+          default: transactional
+          example: "transactional"
+
+    NotificationPayload:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [push, email, sms, in_app]
+        title:
+          type: string
+        body:
+          type: string
+        templateId:
+          type: string
+        variables:
+          type: object
+          additionalProperties: true
+        priority:
+          type: string
+          enum: [low, normal, high]
+
+    NotificationResponse:
+      type: object
+      properties:
+        notificationId:
+          type: string
+          example: "notif_abc123xyz"
+        status:
+          type: string
+          enum: [sent, queued, failed]
+          example: "sent"
+        channels:
+          type: object
+          additionalProperties:
+            type: string
+            enum: [delivered, queued, failed]
+          example:
+            push: "delivered"
+            email: "queued"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              channel:
+                type: string
+              error:
+                type: string
+
+    PushNotificationRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          description: Send to all user's devices
+          example: "usr_1a2b3c4d5e6f"
+        deviceToken:
+          type: string
+          description: Send to specific device token
+          example: "fcm_token_abc123xyz"
+        title:
+          type: string
+          maxLength: 100
+          example: "New Feature Available"
+        body:
+          type: string
+          maxLength: 500
+          example: "Check out our latest update"
+        icon:
+          type: string
+          format: uri
+          example: "https://cdn.company.com/icons/notification.png"
+        image:
+          type: string
+          format: uri
+          example: "https://cdn.company.com/images/feature-banner.jpg"
+        badge:
+          type: integer
+          minimum: 0
+          example: 5
+        sound:
+          type: string
+          example: "default"
+        data:
+          type: object
+          additionalProperties: true
+          example:
+            screen: "features"
+            featureId: "feature_123"
+        priority:
+          type: string
+          enum: [low, normal, high]
+          default: normal
+        ttl:
+          type: integer
+          description: Time to live in seconds
+          example: 3600
+        collapseKey:
+          type: string
+          description: Identifier for notification grouping
+          example: "new_messages"
+
+    PushNotificationResponse:
+      type: object
+      properties:
+        notificationId:
+          type: string
+          example: "notif_push_123"
+        status:
+          type: string
+          enum: [delivered, queued, failed]
+          example: "delivered"
+        deliveredDevices:
+          type: integer
+          example: 2
+        failedDevices:
+          type: integer
+          example: 0
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+
+    EmailNotificationRequest:
+      type: object
+      required:
+        - to
+        - subject
+      properties:
+        to:
+          type: string
+          format: email
+          example: "user@example.com"
+        cc:
+          type: array
+          items:
+            type: string
+            format: email
+          example: ["manager@example.com"]
+        bcc:
+          type: array
+          items:
+            type: string
+            format: email
+        from:
+          type: string
+          format: email
+          example: "noreply@company.com"
+        replyTo:
+          type: string
+          format: email
+          example: "support@company.com"
+        subject:
+          type: string
+          maxLength: 200
+          example: "Welcome to Company"
+        body:
+          type: string
+          description: Plain text or HTML content
+          example: "<h1>Welcome!</h1><p>Thank you for joining us.</p>"
+        templateId:
+          type: string
+          example: "welcome_email"
+        variables:
+          type: object
+          additionalProperties: true
+          example:
+            userName: "John Doe"
+            activationLink: "https://company.com/activate/abc123"
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              filename:
+                type: string
+                example: "invoice.pdf"
+              contentType:
+                type: string
+                example: "application/pdf"
+              url:
+                type: string
+                format: uri
+                example: "https://cdn.company.com/files/invoice.pdf"
+              content:
+                type: string
+                format: base64
+                description: Base64 encoded file content
+
+    EmailNotificationResponse:
+      type: object
+      properties:
+        notificationId:
+          type: string
+          example: "notif_email_123"
+        messageId:
+          type: string
+          description: Provider message ID
+          example: "ses_msg_abc123"
+        status:
+          type: string
+          enum: [sent, queued, failed]
+          example: "sent"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+
+    SmsNotificationRequest:
+      type: object
+      required:
+        - phoneNumber
+        - message
+      properties:
+        phoneNumber:
+          type: string
+          pattern: '^\+?[1-9]\d{1,14}$'
+          example: "+1234567890"
+        message:
+          type: string
+          maxLength: 160
+          example: "Your verification code is: 123456"
+        templateId:
+          type: string
+          example: "verification_code"
+        variables:
+          type: object
+          additionalProperties: true
+          example:
+            code: "123456"
+            expiryMinutes: 5
+        sender:
+          type: string
+          maxLength: 11
+          description: Sender ID (alphanumeric)
+          example: "Company"
+
+    SmsNotificationResponse:
+      type: object
+      properties:
+        notificationId:
+          type: string
+          example: "notif_sms_123"
+        messageId:
+          type: string
+          description: Provider message ID
+          example: "twilio_msg_abc123"
+        status:
+          type: string
+          enum: [sent, queued, failed]
+          example: "sent"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+        segmentCount:
+          type: integer
+          description: Number of SMS segments
+          example: 1
+
+    InAppNotification:
+      type: object
+      properties:
+        notificationId:
+          type: string
+          example: "notif_inapp_123"
+        userId:
+          type: string
+          example: "usr_1a2b3c4d5e6f"
+        title:
+          type: string
+          example: "New Message"
+        body:
+          type: string
+          example: "You have a new message from John"
+        icon:
+          type: string
+          format: uri
+          example: "https://cdn.company.com/icons/message.png"
+        actionUrl:
+          type: string
+          format: uri
+          example: "/messages/msg_123"
+        data:
+          type: object
+          additionalProperties: true
+          example:
+            messageId: "msg_123"
+        category:
+          type: string
+          enum: [marketing, transactional, social, system]
+          example: "social"
+        priority:
+          type: string
+          enum: [low, normal, high]
+          example: "normal"
+        status:
+          type: string
+          enum: [unread, read, archived]
+          example: "unread"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+        readAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-01-07T10:00:00Z"
+
+    DeviceRegistrationRequest:
+      type: object
+      required:
+        - deviceToken
+        - platform
+      properties:
+        deviceToken:
+          type: string
+          example: "fcm_token_abc123xyz"
+        platform:
+          type: string
+          enum: [android, ios, web]
+          example: "android"
+        deviceId:
+          type: string
+          example: "device_123"
+        deviceName:
+          type: string
+          example: "Samsung Galaxy S21"
+        appVersion:
+          type: string
+          example: "2.1.0"
+        osVersion:
+          type: string
+          example: "Android 12"
+
+    DeviceResponse:
+      type: object
+      properties:
+        deviceId:
+          type: string
+          example: "device_123"
+        deviceToken:
+          type: string
+          example: "fcm_token_abc123xyz"
+        platform:
+          type: string
+          enum: [android, ios, web]
+          example: "android"
+        deviceName:
+          type: string
+          example: "Samsung Galaxy S21"
+        appVersion:
+          type: string
+          example: "2.1.0"
+        registeredAt:
+          type: string
+          format: date-time
+          example: "2025-12-01T10:00:00Z"
+        lastUsedAt:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+        active:
+          type: boolean
+          example: true
+
+    NotificationPreferences:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: "usr_1a2b3c4d5e6f"
+        channels:
+          type: object
+          properties:
+            push:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  example: true
+                quietHours:
+                  type: object
+                  properties:
+                    enabled:
+                      type: boolean
+                      example: true
+                    start:
+                      type: string
+                      format: time
+                      example: "22:00"
+                    end:
+                      type: string
+                      format: time
+                      example: "08:00"
+                    timezone:
+                      type: string
+                      example: "America/New_York"
+            email:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  example: true
+                frequency:
+                  type: string
+                  enum: [instant, daily_digest, weekly_digest]
+                  example: "instant"
+            sms:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  example: false
+            in_app:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                  example: true
+        categories:
+          type: object
+          properties:
+            marketing:
+              type: object
+              properties:
+                push:
+                  type: boolean
+                  example: false
+                email:
+                  type: boolean
+                  example: true
+                sms:
+                  type: boolean
+                  example: false
+            transactional:
+              type: object
+              properties:
+                push:
+                  type: boolean
+                  example: true
+                email:
+                  type: boolean
+                  example: true
+                sms:
+                  type: boolean
+                  example: true
+            social:
+              type: object
+              properties:
+                push:
+                  type: boolean
+                  example: true
+                email:
+                  type: boolean
+                  example: false
+                sms:
+                  type: boolean
+                  example: false
+            system:
+              type: object
+              properties:
+                push:
+                  type: boolean
+                  example: true
+                email:
+                  type: boolean
+                  example: true
+                sms:
+                  type: boolean
+                  example: false
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+
+    NotificationTemplate:
+      type: object
+      properties:
+        templateId:
+          type: string
+          example: "welcome_email"
+        name:
+          type: string
+          example: "Welcome Email"
+        description:
+          type: string
+          example: "Email sent to new users after registration"
+        channel:
+          type: string
+          enum: [push, email, sms, in_app]
+          example: "email"
+        category:
+          type: string
+          enum: [marketing, transactional, social, system]
+          example: "transactional"
+        subject:
+          type: string
+          example: "Welcome to {{companyName}}"
+        body:
+          type: string
+          example: "<h1>Welcome {{userName}}!</h1><p>Click <a href='{{activationLink}}'>here</a> to activate your account.</p>"
+        variables:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: "userName"
+              type:
+                type: string
+                enum: [string, number, boolean, date]
+                example: "string"
+              required:
+                type: boolean
+                example: true
+              defaultValue:
+                type: string
+                example: "User"
+        active:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: "2025-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+
+    CreateTemplateRequest:
+      type: object
+      required:
+        - templateId
+        - name
+        - channel
+        - body
+      properties:
+        templateId:
+          type: string
+          pattern: '^[a-z0-9_]+$'
+          example: "welcome_email"
+        name:
+          type: string
+          example: "Welcome Email"
+        description:
+          type: string
+          example: "Email sent to new users"
+        channel:
+          type: string
+          enum: [push, email, sms, in_app]
+        category:
+          type: string
+          enum: [marketing, transactional, social, system]
+        subject:
+          type: string
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+              required:
+                type: boolean
+              defaultValue:
+                type: string
+
+    UpdateTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: object
+        active:
+          type: boolean
+
+    AnalyticsSummary:
+      type: object
+      properties:
+        period:
+          type: object
+          properties:
+            startDate:
+              type: string
+              format: date
+              example: "2025-12-01"
+            endDate:
+              type: string
+              format: date
+              example: "2025-12-31"
+        metrics:
+          type: object
+          properties:
+            totalSent:
+              type: integer
+              example: 10000
+            totalDelivered:
+              type: integer
+              example: 9500
+            totalFailed:
+              type: integer
+              example: 500
+            deliveryRate:
+              type: number
+              format: float
+              example: 95.0
+            openRate:
+              type: number
+              format: float
+              example: 45.2
+            clickRate:
+              type: number
+              format: float
+              example: 12.8
+        byChannel:
+          type: object
+          properties:
+            push:
+              type: object
+              properties:
+                sent:
+                  type: integer
+                  example: 5000
+                delivered:
+                  type: integer
+                  example: 4800
+                opened:
+                  type: integer
+                  example: 2400
+            email:
+              type: object
+              properties:
+                sent:
+                  type: integer
+                  example: 3000
+                delivered:
+                  type: integer
+                  example: 2950
+                opened:
+                  type: integer
+                  example: 1200
+                clicked:
+                  type: integer
+                  example: 350
+            sms:
+              type: object
+              properties:
+                sent:
+                  type: integer
+                  example: 2000
+                delivered:
+                  type: integer
+                  example: 1950
+        byCategory:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              sent:
+                type: integer
+              delivered:
+                type: integer
+
+    NotificationStatus:
+      type: object
+      properties:
+        notificationId:
+          type: string
+          example: "notif_abc123"
+        status:
+          type: string
+          enum: [sent, delivered, opened, clicked, failed]
+          example: "delivered"
+        channel:
+          type: string
+          enum: [push, email, sms, in_app]
+          example: "push"
+        sentAt:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+        deliveredAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-12-31T10:00:05Z"
+        openedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-12-31T10:05:00Z"
+        clickedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        failureReason:
+          type: string
+          nullable: true
+          example: null
+        deviceInfo:
+          type: object
+          properties:
+            platform:
+              type: string
+              example: "android"
+            deviceId:
+              type: string
+              example: "device_123"
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+        - timestamp
+      properties:
+        error:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Invalid input data"
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-12-31T10:00:00Z"
+        path:
+          type: string
+          example: "/notifications/v1/send"
+        requestId:
+          type: string
+          example: "req_abc123xyz"
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "BAD_REQUEST"
+            message: "Invalid request parameters"
+            timestamp: "2025-12-31T10:00:00Z"
+
+    Unauthorized:
+      description: Unauthorized - authentication required or failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "UNAUTHORIZED"
+            message: "Invalid or expired token"
+            timestamp: "2025-12-31T10:00:00Z"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "NOT_FOUND"
+            message: "Resource not found"
+            timestamp: "2025-12-31T10:00:00Z"
+
+    TooManyRequests:
+      description: Too many requests - rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          example: 100
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          example: 0
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+            format: unix-timestamp
+          example: 1735646400
+        Retry-After:
+          schema:
+            type: integer
+          example: 60
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "RATE_LIMIT_EXCEEDED"
+            message: "Too many requests. Please try again later."
+            timestamp: "2025-12-31T10:00:00Z"
+
