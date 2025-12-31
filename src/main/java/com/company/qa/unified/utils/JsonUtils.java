@@ -140,5 +140,31 @@ public final class JsonUtils {
             throw new RuntimeException("Failed to parse JSON from InputStream", e);
         }
     }
+
+    /**
+     * Escape JSON string for embedding in another JSON string.
+     * Useful for API requests that need JSON as a string value.
+     *
+     * @param json JSON string to escape
+     * @return escaped JSON string suitable for use as JSON value
+     */
+    public static String escapeJson(String json) {
+        if (json == null) {
+            return "null";
+        }
+        try {
+            // Use Jackson to properly escape the string
+            return MAPPER.writeValueAsString(json);
+        } catch (Exception e) {
+            // Fallback to manual escaping
+            return "\"" + json
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\n", "\\n")
+                    .replace("\r", "\\r")
+                    .replace("\t", "\\t")
+                    + "\"";
+        }
+    }
 }
 

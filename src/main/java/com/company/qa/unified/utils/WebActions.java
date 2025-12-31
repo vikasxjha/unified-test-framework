@@ -1,5 +1,6 @@
 package com.company.qa.unified.utils;
 
+import com.company.qa.unified.config.RuntimeConfig;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
@@ -212,5 +213,45 @@ public class WebActions {
     public void close() {
         log.info("❌ Closing page");
         page.close();
+    }
+
+    /* =========================================================
+       AI SELF-HEALING LOCATOR
+       ========================================================= */
+
+    /**
+     * Find element with AI-powered self-healing capability.
+     *
+     * If the locator fails and self-healing is enabled:
+     * 1. Analyzes the page DOM
+     * 2. Uses AI to suggest a corrected locator
+     * 3. Retries with the healed locator
+     *
+     * @param page    Playwright page instance
+     * @param locator CSS/XPath selector
+     * @param intent  Human-readable description of the element (e.g., "login button")
+     * @return Located element
+     * @throws Exception if element cannot be found even after healing
+     */
+    public static Locator find(Page page, String locator, String intent) {
+
+        try {
+            return page.locator(locator);
+        } catch (Exception e) {
+
+            if (!ScenarioContext.isSelfHealingEnabled()
+                    || !RuntimeConfig.AI_SELF_HEALING_ENABLED) {
+                throw e;
+            }
+
+            String healed =
+                    AiSelfHealingLocatorUtil.healLocatorIfNeeded(
+                            page,
+                            locator,
+                            intent
+                    );
+
+            return page.locator(healed);
+        }
     }
 }

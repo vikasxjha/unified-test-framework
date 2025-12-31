@@ -4,7 +4,9 @@ import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
 import io.appium.java_client.AppiumBy;
+import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.ios.IOSDriver;
+import org.openqa.selenium.By;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -31,7 +33,7 @@ public class IosLoginScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(IosLoginScreen.class);
 
-    private final IOSDriver driver;
+    private final AppiumDriver driver;
 
     /* =========================================================
        LOCATORS (XCUI)
@@ -60,8 +62,7 @@ public class IosLoginScreen extends BaseMobileScreen {
 
     public IosLoginScreen() {
         super(AppiumDriverFactory.getDriver());
-        this.driver =
-                (IOSDriver) AppiumDriverFactory.getDriver();
+        this.driver = AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================
@@ -109,7 +110,7 @@ public class IosLoginScreen extends BaseMobileScreen {
             ).click();
 
             By country =
-                    MobileBy.iOSNsPredicateString(
+                    AppiumBy.iOSNsPredicateString(
                             "label == '" + countryName + "'"
                     );
 
@@ -144,8 +145,7 @@ public class IosLoginScreen extends BaseMobileScreen {
 
         phone.clear();
         phone.sendKeys(phoneNumber);
-
-        driver.getKeyboard().pressKey("\n");
+        phone.sendKeys("\n"); // Press return/enter key
 
         return this;
     }

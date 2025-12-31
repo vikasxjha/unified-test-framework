@@ -46,7 +46,7 @@
         <dependency>
             <groupId>com.microsoft.playwright</groupId>
             <artifactId>playwright</artifactId>
-            <version>1.44.0</version>
+            <version>1.45.0</version>
         </dependency>
         <!-- Pact JVM Consumer -->
         <dependency>
@@ -61,7 +61,6 @@
             <groupId>au.com.dius.pact.provider</groupId>
             <artifactId>junit5</artifactId>
             <version>4.6.10</version>
-            <scope>test</scope>
         </dependency>
 
         <!-- RestAssured for API testing -->
@@ -104,6 +103,32 @@
             <version>2.17.1</version>
         </dependency>
 
+        <!-- Apache POI for Excel file handling -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>5.2.5</version>
+        </dependency>
+
+        <!-- LangChain4j Ollama for AI integration -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-ollama</artifactId>
+            <version>0.35.0</version>
+        </dependency>
+
+        <!-- Jakarta Mail API for email notifications -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
+
         <!-- JUnit 5 for annotations and assertions -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -122,6 +147,20 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-testng</artifactId>
             <version>2.25.0</version>
+        </dependency>
+
+        <!-- JSON Schema Validator -->
+        <dependency>
+            <groupId>com.github.erosb</groupId>
+            <artifactId>everit-json-schema</artifactId>
+            <version>1.14.4</version>
+        </dependency>
+
+        <!-- AssertJ for fluent assertions -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.24.2</version>
         </dependency>
 
     </dependencies>

@@ -1,12 +1,12 @@
 package com.company.qa.unified.utils;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.TouchAction;
-import io.appium.java_client.touch.WaitOptions;
-import io.appium.java_client.touch.offset.PointOption;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.PointerInput;
+import org.openqa.selenium.interactions.Sequence;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,9 +31,9 @@ public class MobileActions {
     private static final Log log =
             Log.get(MobileActions.class);
 
-    private final AppiumDriver<?> driver;
+    private final AppiumDriver driver;
 
-    public MobileActions(AppiumDriver<?> driver) {
+    public MobileActions(AppiumDriver driver) {
         this.driver = driver;
     }
 
@@ -94,12 +94,15 @@ public class MobileActions {
 
         log.debug("📲 Swipe vertical {} -> {}", startY, endY);
 
-        new TouchAction<>(driver)
-                .press(PointOption.point(x, startY))
-                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(600)))
-                .moveTo(PointOption.point(x, endY))
-                .release()
-                .perform();
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence swipe = new Sequence(finger, 1);
+
+        swipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), x, startY));
+        swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        swipe.addAction(finger.createPointerMove(Duration.ofMillis(600), PointerInput.Origin.viewport(), x, endY));
+        swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        driver.perform(Collections.singletonList(swipe));
     }
 
     public void swipeUp() {
@@ -116,12 +119,15 @@ public class MobileActions {
         int startX = (int) (size.width * 0.8);
         int endX = (int) (size.width * 0.2);
 
-        new TouchAction<>(driver)
-                .press(PointOption.point(startX, y))
-                .waitAction(WaitOptions.waitOptions(Duration.ofMillis(600)))
-                .moveTo(PointOption.point(endX, y))
-                .release()
-                .perform();
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence swipe = new Sequence(finger, 1);
+
+        swipe.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, y));
+        swipe.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        swipe.addAction(finger.createPointerMove(Duration.ofMillis(600), PointerInput.Origin.viewport(), endX, y));
+        swipe.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
+
+        driver.perform(Collections.singletonList(swipe));
     }
 
     /* =========================================================
@@ -148,8 +154,15 @@ public class MobileActions {
 
     public void hideKeyboard() {
         try {
-            driver.hideKeyboard();
-        } catch (Exception ignored) {
+            // In Appium 9.x, hideKeyboard is removed. Use driver.executeScript instead
+            driver.executeScript("mobile: hideKeyboard");
+        } catch (Exception e) {
+            // Try alternate method - press back button on Android or tap outside on iOS
+            try {
+                driver.navigate().back();
+            } catch (Exception ignored) {
+                // Keyboard hiding not supported or already hidden
+            }
         }
     }
 

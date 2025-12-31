@@ -4,7 +4,8 @@ import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.ios.IOSDriver;
+import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.By;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -31,7 +32,7 @@ public class IosHomeScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(IosHomeScreen.class);
 
-    private final IOSDriver driver;
+    private final AppiumDriver driver;
 
     /* =========================================================
        LOCATORS (XCUI)
@@ -60,8 +61,7 @@ public class IosHomeScreen extends BaseMobileScreen {
 
     public IosHomeScreen() {
         super(AppiumDriverFactory.getDriver());
-        this.driver =
-                (IOSDriver) AppiumDriverFactory.getDriver();
+        this.driver = AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================
@@ -126,8 +126,7 @@ public class IosHomeScreen extends BaseMobileScreen {
 
         box.clear();
         box.sendKeys(query);
-
-        driver.getKeyboard().pressKey("\n");
+        box.sendKeys("\n"); // Press return/enter key
 
         return this;
     }

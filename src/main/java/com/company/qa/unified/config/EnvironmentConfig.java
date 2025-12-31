@@ -28,6 +28,16 @@ public final class EnvironmentConfig {
     private static final String ENV_PROPERTY = "env";
     private static final String DEFAULT_ENV = "QA";
 
+    // AI provider settings
+    public static final String AI_PROVIDER = "OPENAI";
+    public static final String AI_MODEL = "gpt-4o-mini";
+
+    public static final String AI_API_KEY =
+            System.getenv("OPENAI_API_KEY");
+
+    public static final String AI_ENDPOINT =
+            "https://api.openai.com/v1/chat/completions";
+
     private static volatile EnvironmentConfig INSTANCE;
 
     private final String environmentName;
@@ -254,7 +264,7 @@ public final class EnvironmentConfig {
         return value;
     }
 
-    protected String getOptional(String key) {
+    public String getOptional(String key) {
         Object value = resolveNestedKey(key);
         return value == null ? null : value.toString();
     }

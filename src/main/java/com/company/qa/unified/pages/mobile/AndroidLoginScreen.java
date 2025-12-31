@@ -3,10 +3,9 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.nativekey.AndroidKey;
-import io.appium.java_client.android.nativekey.KeyEvent;
+import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -31,7 +30,7 @@ public class AndroidLoginScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(AndroidLoginScreen.class);
 
-    private final AndroidDriver driver;
+    private final AppiumDriver driver;
 
     /* =========================================================
        LOCATORS
@@ -58,7 +57,7 @@ public class AndroidLoginScreen extends BaseMobileScreen {
 
     public AndroidLoginScreen() {
         super(AppiumDriverFactory.getDriver());
-        this.driver = (AndroidDriver) AppiumDriverFactory.getDriver();
+        this.driver = AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================
@@ -134,10 +133,7 @@ public class AndroidLoginScreen extends BaseMobileScreen {
 
         phone.clear();
         phone.sendKeys(phoneNumber);
-
-        driver.pressKey(
-                new KeyEvent(AndroidKey.ENTER)
-        );
+        phone.sendKeys(Keys.ENTER);
 
         return this;
     }

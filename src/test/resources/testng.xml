@@ -7,6 +7,13 @@
        thread-count="4">
 
     <!-- =====================================================
+         GLOBAL LISTENERS
+         ===================================================== -->
+    <listeners>
+        <listener class-name="com.company.qa.unified.listeners.UnifiedTestListener"/>
+    </listeners>
+
+    <!-- =====================================================
          GLOBAL PARAMETERS
          These can be overridden via:
          mvn test -Denv=qa -Dbrowser=chromium

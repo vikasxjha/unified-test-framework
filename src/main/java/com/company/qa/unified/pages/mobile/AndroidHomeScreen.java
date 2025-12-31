@@ -3,10 +3,9 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.nativekey.AndroidKey;
-import io.appium.java_client.android.nativekey.KeyEvent;
+import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,7 +31,7 @@ public class AndroidHomeScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(AndroidHomeScreen.class);
 
-    private final AndroidDriver driver;
+    private final AppiumDriver driver;
 
     /* =========================================================
        LOCATORS
@@ -59,7 +58,7 @@ public class AndroidHomeScreen extends BaseMobileScreen {
 
     public AndroidHomeScreen() {
         super(AppiumDriverFactory.getDriver());
-        this.driver = (AndroidDriver) AppiumDriverFactory.getDriver();
+        this.driver = AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================
@@ -187,10 +186,7 @@ public class AndroidHomeScreen extends BaseMobileScreen {
 
         box.clear();
         box.sendKeys(query);
-
-        driver.pressKey(
-                new KeyEvent(AndroidKey.ENTER)
-        );
+        box.sendKeys(Keys.ENTER);
 
         return this;
     }
@@ -240,7 +236,7 @@ public class AndroidHomeScreen extends BaseMobileScreen {
 
         if (isElementPresent(permissionAllowButton, 3)) {
             log.info("Granting permission");
-            driver.findElement(permissionAllowButton).click();
+            WaitUtils.waitForClickable(driver, permissionAllowButton, 3).click();
         }
 
         return this;

@@ -3,7 +3,7 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -19,7 +19,7 @@ public class AndroidOtpVerificationScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(AndroidOtpVerificationScreen.class);
 
-    private final AndroidDriver driver;
+    private final AppiumDriver driver;
 
     /* Locators */
     private final By otpInput = By.id("com.truecaller:id/otpInput");
@@ -27,7 +27,7 @@ public class AndroidOtpVerificationScreen extends BaseMobileScreen {
 
     public AndroidOtpVerificationScreen() {
         super(AppiumDriverFactory.getDriver());
-        this.driver = (AndroidDriver) AppiumDriverFactory.getDriver();
+        this.driver = AppiumDriverFactory.getDriver();
     }
 
     public AndroidOtpVerificationScreen enterOtp(String otp) {

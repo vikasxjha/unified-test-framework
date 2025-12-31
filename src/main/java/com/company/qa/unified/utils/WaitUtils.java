@@ -32,10 +32,11 @@ public final class WaitUtils {
        ========================================================= */
 
     private static WebDriverWait wait(WebDriver driver, int seconds) {
-        return new WebDriverWait(driver, Duration.ofSeconds(seconds))
-                .pollingEvery(Duration.ofMillis(DEFAULT_POLLING_MS))
-                .ignoring(NoSuchElementException.class)
-                .ignoring(StaleElementReferenceException.class);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(seconds));
+        wait.pollingEvery(Duration.ofMillis(DEFAULT_POLLING_MS));
+        wait.ignoring(NoSuchElementException.class);
+        wait.ignoring(StaleElementReferenceException.class);
+        return wait;
     }
 
     /* =========================================================

@@ -3,7 +3,7 @@ package com.company.qa.unified.pages.mobile;
 import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.WaitUtils;
-import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -33,7 +33,7 @@ public class AndroidNotificationCenterScreen extends BaseMobileScreen {
     private static final Log log =
             Log.get(AndroidNotificationCenterScreen.class);
 
-    private final AndroidDriver driver;
+    private final AppiumDriver driver;
 
     /* =========================================================
        LOCATORS
@@ -63,8 +63,7 @@ public class AndroidNotificationCenterScreen extends BaseMobileScreen {
 
     public AndroidNotificationCenterScreen() {
         super(AppiumDriverFactory.getDriver());
-        this.driver =
-                (AndroidDriver) AppiumDriverFactory.getDriver();
+        this.driver = AppiumDriverFactory.getDriver();
     }
 
     /* =========================================================

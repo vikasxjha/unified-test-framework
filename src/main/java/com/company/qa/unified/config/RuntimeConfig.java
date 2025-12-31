@@ -36,6 +36,61 @@ public final class RuntimeConfig {
     private static final String RECORD_VIDEO = "recordVideo";
     private static final String RECORD_TRACE = "recordTrace";
     private static final String SLOW_MO = "slowMo";
+    private static final String RETRY_COUNT = "retryCount";
+    private static final String NOTIFICATIONS_ENABLED = "notifications.enabled";
+    private static final String NOTIFICATIONS_ON_FAILURE = "notifications.onFailure";
+
+    /* =========================================================
+       AI SELF-HEALING CONFIGURATION
+       ========================================================= */
+
+    // Enable AI self-healing at runtime
+    public static final boolean AI_SELF_HEALING_ENABLED =
+            Boolean.parseBoolean(
+                    System.getProperty("ai.self.heal",
+                            System.getenv().getOrDefault("AI_SELF_HEAL", "false"))
+            );
+
+    // Minimum confidence required from AI
+    public static final int AI_HEAL_CONFIDENCE_THRESHOLD =
+            Integer.parseInt(
+                    System.getProperty("ai.heal.confidence", "70")
+            );
+
+    // Enable healing only in CI
+    public static final boolean AI_HEAL_ONLY_IN_CI =
+            Boolean.parseBoolean(
+                    System.getenv().getOrDefault("CI", "false")
+            );
+
+    /* =========================================================
+       NOTIFICATION CONFIGURATION
+       ========================================================= */
+
+    // Enable notifications (email, Slack, etc.)
+    public static final boolean NOTIFICATIONS_ENABLED =
+            Boolean.parseBoolean(
+                    System.getProperty("notifications.enabled",
+                            String.valueOf(DEFAULT_NOTIFICATIONS_ENABLED))
+            );
+
+    // Send notifications on test failure only
+    public static final boolean NOTIFICATIONS_ON_FAILURE =
+            Boolean.parseBoolean(
+                    System.getProperty("notifications.onFailure",
+                            String.valueOf(DEFAULT_NOTIFICATIONS_ON_FAILURE))
+            );
+
+    /* =========================================================
+       RETRY CONFIGURATION
+       ========================================================= */
+
+    // Maximum retry count for flaky tests
+    public static final int MAX_RETRY_COUNT =
+            Integer.parseInt(
+                    System.getProperty("retryCount",
+                            String.valueOf(DEFAULT_RETRY_COUNT))
+            );
 
     /* =========================================================
        DEFAULTS
@@ -46,6 +101,9 @@ public final class RuntimeConfig {
     private static final boolean DEFAULT_PARALLEL = true;
     private static final int DEFAULT_THREAD_COUNT = 4;
     private static final int DEFAULT_SLOW_MO = 0;
+    private static final int DEFAULT_RETRY_COUNT = 1;
+    private static final boolean DEFAULT_NOTIFICATIONS_ENABLED = false;
+    private static final boolean DEFAULT_NOTIFICATIONS_ON_FAILURE = true;
 
     private RuntimeConfig() {
         // utility

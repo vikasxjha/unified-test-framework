@@ -82,6 +82,13 @@ jobs:
       # Smoke Tests (Confidence Gate)
       # --------------------------------------------------
       - name: Run Smoke Tests
+        env:
+          SMTP_HOST: smtp.gmail.com
+          SMTP_PORT: 465
+          SMTP_USERNAME: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: test-automation@company.com
+          MAIL_TO: qa-team@company.com
         run: |
           mvn -B test \
             -Denv=qa \

@@ -1,17 +1,20 @@
 package com.company.qa.unified.contracts;
 
+import au.com.dius.pact.provider.junitsupport.loader.PactBrokerAuth;
 import com.company.qa.unified.config.EnvironmentConfig;
 import com.company.qa.unified.config.EnvironmentType;
 import com.company.qa.unified.utils.Log;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import au.com.dius.pact.provider.junit5.*;
-import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junitsupport.*;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.net.URI;
 import java.util.Map;
 import java.util.UUID;
 
@@ -19,15 +22,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Base class for Pact Provider verification.
- *
- * How to use:
- *  - Extend this class in each provider verification test
- *  - Annotate subclass with @Provider("service-name")
- *  - Ensure provider base URL is configured via env-config.json
- *
- * Safety:
- *  - Provider verification is blocked in PROD unless explicitly allowed
  */
+@Provider("provider-name") // overridden by subclasses
 @ExtendWith(PactVerificationInvocationContextProvider.class)
 @PactBroker(
         url = "#{systemProperties['pact.broker.url']}",
@@ -43,14 +39,13 @@ public abstract class ProviderVerifier {
     protected static final EnvironmentType ENV_TYPE = EnvironmentType.current();
 
     /**
-     * Subclasses must return the base URL of the provider under test.
+     * Subclasses must return base URL.
      * Example: https://lookup.qa.company.com
      */
     protected abstract String providerBaseUrl();
 
     /**
-     * Optional: allow provider verification in PROD
-     * (default false, strongly discouraged)
+     * Override ONLY if you really want PROD verification.
      */
     protected boolean allowProdVerification() {
         return false;
@@ -62,7 +57,7 @@ public abstract class ProviderVerifier {
 
     @BeforeAll
     static void beforeAll() {
-        PactConfig.logSummary();
+        log.info("Starting Pact Provider Verification");
 
         if (ENV_TYPE.isProd()) {
             log.warn("⚠️ Running Pact provider verification in PROD");
@@ -74,6 +69,7 @@ public abstract class ProviderVerifier {
        ========================================================= */
 
     @BeforeEach
+    @ExtendWith(PactVerificationInvocationContextProvider.class)
     void beforeEach(PactVerificationContext context) {
 
         if (context == null) {
@@ -85,51 +81,38 @@ public abstract class ProviderVerifier {
             fail("❌ Pact provider verification is not allowed in PROD");
         }
 
-        // Set provider target dynamically
+        URI baseUri = URI.create(providerBaseUrl());
+
+        int port = baseUri.getPort() == -1
+                ? baseUri.getScheme().equals("https") ? 443 : 80
+                : baseUri.getPort();
+
         context.setTarget(
                 new HttpTestTarget(
-                        providerBaseUrl()
+                        baseUri.getHost(),
+                        port,
+                        baseUri.getScheme()
                 )
         );
 
-        // Add request filters (auth, headers, tracing)
-        context.addRequestFilter((request, executionContext) -> {
-            request.addHeader("X-Correlation-Id", UUID.randomUUID().toString());
-            request.addHeader("User-Agent", "pact-provider-verifier");
-
-            // Optional auth header from credentials
-            String token = ENV.getOptional("provider.authToken");
-            if (token != null && !token.isBlank()) {
-                request.addHeader("Authorization", "Bearer " + token);
-            }
-
-            return request;
-        });
-
-        log.info("🔍 Verifying Pact interaction: {}",
-                context.getInteraction().getDescription());
+        log.info(
+                "🔍 Verifying Pact interaction: {}",
+                context.getInteraction().getDescription()
+        );
     }
 
     /* =========================================================
-       PROVIDER STATE MANAGEMENT
+       PROVIDER STATES
        ========================================================= */
 
-    /**
-     * Default provider state handler.
-     * Subclasses can override or add more @State methods.
-     */
     @State("provider is healthy")
     public void providerIsHealthy(Map<String, Object> params) {
         log.info("Setting provider state: provider is healthy");
         // No-op by default
-        // Subclasses may:
-        // - seed DB
-        // - mock downstreams
-        // - reset caches
     }
 
     /* =========================================================
-       VERIFICATION TEMPLATE
+       VERIFICATION
        ========================================================= */
 
     @TestTemplate

@@ -6,6 +6,7 @@ import com.company.qa.unified.drivers.AppiumDriverFactory;
 import com.company.qa.unified.utils.Log;
 import com.company.qa.unified.utils.ReportPublisher;
 import com.company.qa.unified.utils.NotificationUtils;
+import com.company.qa.unified.utils.ScenarioContext;
 import com.microsoft.playwright.Page;
 import io.appium.java_client.AppiumDriver;
 import io.cucumber.java.*;
@@ -54,6 +55,15 @@ public class Hooks {
         }
 
         ReportPublisher.step("Infrastructure setup completed");
+    }
+
+    @Before
+    public void beforeScenario(Scenario scenario) {
+
+        boolean enableHealing =
+                scenario.getSourceTagNames().contains("@selfHeal");
+
+        ScenarioContext.enableSelfHealing(enableHealing);
     }
 
     /* =========================================================

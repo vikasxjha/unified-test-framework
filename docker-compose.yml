@@ -140,6 +140,12 @@ services:
       ENV: QA
       TAGS: "@smoke"
       THREADS: 4
+      SMTP_HOST: ${SMTP_HOST:-smtp.gmail.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USERNAME: ${SMTP_USERNAME}
+      SMTP_PASSWORD: ${SMTP_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM:-test-automation@company.com}
+      MAIL_TO: ${MAIL_TO:-qa-team@company.com}
     command: >
       bash -c "./scripts/run-tests.sh"
     depends_on:

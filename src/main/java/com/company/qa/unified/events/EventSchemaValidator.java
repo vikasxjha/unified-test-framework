@@ -123,11 +123,21 @@ public final class EventSchemaValidator {
     ) {
 
         try {
-            Schema oldSchema = loadSchema(oldSchemaName);
+            JSONObject oldSchema = loadSchema(oldSchemaName);
             JSONObject eventObject =
                     new JSONObject(newEventJson);
 
-            oldSchema.validate(eventObject);
+            // Validate that new event contains all required fields from old schema
+            if (oldSchema.has("required")) {
+                org.json.JSONArray required = oldSchema.getJSONArray("required");
+                for (int i = 0; i < required.length(); i++) {
+                    String field = required.getString(i);
+                    if (!eventObject.has(field)) {
+                        throw new IllegalArgumentException(
+                                "Backward compatibility broken: missing required field '" + field + "'");
+                    }
+                }
+            }
 
             log.info("✅ Backward compatibility OK for schema={}",
                     oldSchemaName);

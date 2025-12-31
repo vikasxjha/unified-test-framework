@@ -1,5 +1,6 @@
 package com.company.qa.unified.pages.api;
 
+import com.company.qa.unified.drivers.APIClientFactory;
 import com.company.qa.unified.utils.Log;
 import io.restassured.response.Response;
 
@@ -185,6 +186,7 @@ public class SearchApi extends BaseApiClient {
                                 "If-None-Match",
                                 etag
                         ))
+                        .when()
                         .get("/search?q=" + query);
 
         if (response.statusCode() != 200 &&
