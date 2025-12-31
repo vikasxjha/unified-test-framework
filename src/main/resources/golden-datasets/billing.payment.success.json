@@ -1,0 +1,325 @@
+{
+  "event": {
+    "eventId": "evt_payment_success_1a2b3c4d",
+    "eventType": "billing.payment.success",
+    "eventVersion": "1.0.0",
+    "timestamp": "2025-12-31T10:30:45.123Z",
+    "source": "billing-service",
+    "correlationId": "corr_xyz789abc456"
+  },
+  "payment": {
+    "paymentId": "pay_1a2b3c4d5e6f7g8h",
+    "transactionId": "txn_abc123xyz789",
+    "externalTransactionId": "ext_stripe_ch_3QRsT4U5vW6xY7z8",
+    "status": "success",
+    "statusCode": "PAYMENT_SUCCESSFUL",
+    "amount": {
+      "value": 99.99,
+      "currency": "USD",
+      "currencySymbol": "$",
+      "formatted": "$99.99"
+    },
+    "originalAmount": {
+      "value": 99.99,
+      "currency": "USD",
+      "formatted": "$99.99"
+    },
+    "processingFee": {
+      "value": 3.19,
+      "currency": "USD",
+      "formatted": "$3.19",
+      "percentage": 2.9,
+      "fixed": 0.30
+    },
+    "netAmount": {
+      "value": 96.80,
+      "currency": "USD",
+      "formatted": "$96.80"
+    },
+    "taxAmount": {
+      "value": 8.50,
+      "currency": "USD",
+      "formatted": "$8.50",
+      "taxRate": 8.5,
+      "taxType": "sales_tax",
+      "taxRegion": "CA"
+    },
+    "discountAmount": {
+      "value": 0.00,
+      "currency": "USD",
+      "formatted": "$0.00"
+    },
+    "paymentMethod": {
+      "type": "credit_card",
+      "provider": "stripe",
+      "brand": "visa",
+      "last4": "4242",
+      "expiryMonth": "12",
+      "expiryYear": "2027",
+      "fingerprint": "fp_abc123xyz",
+      "funding": "credit",
+      "country": "US",
+      "cardholderName": "John Doe",
+      "threeDSecure": {
+        "authenticated": true,
+        "version": "2.1.0",
+        "liabilityShift": "possible"
+      }
+    },
+    "billingAddress": {
+      "name": "John Doe",
+      "line1": "123 Main Street",
+      "line2": "Apt 4B",
+      "city": "San Francisco",
+      "state": "CA",
+      "postalCode": "94105",
+      "country": "US",
+      "countryName": "United States"
+    },
+    "paymentDate": "2025-12-31T10:30:45Z",
+    "capturedAt": "2025-12-31T10:30:46Z",
+    "settledAt": null,
+    "expectedSettlementDate": "2026-01-02T00:00:00Z",
+    "metadata": {
+      "ipAddress": "192.168.1.100",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+      "deviceFingerprint": "dev_fp_abc123xyz",
+      "riskScore": 12,
+      "riskLevel": "low",
+      "avsCheck": "pass",
+      "cvvCheck": "pass",
+      "fraudCheckPassed": true
+    }
+  },
+  "customer": {
+    "customerId": "cust_1a2b3c4d5e6f",
+    "userId": "usr_1a2b3c4d5e6f",
+    "email": "john.doe@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "fullName": "John Doe",
+    "phoneNumber": "+14155551234",
+    "accountType": "premium",
+    "customerSince": "2024-01-15T08:00:00Z",
+    "lifetimeValue": {
+      "value": 1299.99,
+      "currency": "USD",
+      "formatted": "$1,299.99"
+    },
+    "totalPurchases": 13,
+    "loyaltyTier": "gold",
+    "loyaltyPoints": 1299
+  },
+  "order": {
+    "orderId": "ord_abc123xyz789",
+    "orderNumber": "ORD-2025-12-31-0001",
+    "orderDate": "2025-12-31T10:25:30Z",
+    "orderType": "subscription",
+    "items": [
+      {
+        "itemId": "item_premium_monthly",
+        "sku": "PREM-MONTHLY-001",
+        "name": "Premium Monthly Subscription",
+        "description": "Full access to all premium features",
+        "category": "subscription",
+        "quantity": 1,
+        "unitPrice": {
+          "value": 99.99,
+          "currency": "USD",
+          "formatted": "$99.99"
+        },
+        "totalPrice": {
+          "value": 99.99,
+          "currency": "USD",
+          "formatted": "$99.99"
+        },
+        "taxable": true,
+        "metadata": {
+          "billingCycle": "monthly",
+          "nextBillingDate": "2026-01-31T10:30:45Z",
+          "subscriptionId": "sub_abc123xyz",
+          "planId": "plan_premium_monthly"
+        }
+      }
+    ],
+    "subtotal": {
+      "value": 99.99,
+      "currency": "USD",
+      "formatted": "$99.99"
+    },
+    "total": {
+      "value": 99.99,
+      "currency": "USD",
+      "formatted": "$99.99"
+    },
+    "status": "completed",
+    "fulfillmentStatus": "fulfilled"
+  },
+  "subscription": {
+    "subscriptionId": "sub_abc123xyz",
+    "planId": "plan_premium_monthly",
+    "planName": "Premium Monthly",
+    "billingCycle": "monthly",
+    "billingPeriod": {
+      "start": "2025-12-31T10:30:45Z",
+      "end": "2026-01-31T10:30:45Z"
+    },
+    "currentPeriodStart": "2025-12-31T10:30:45Z",
+    "currentPeriodEnd": "2026-01-31T10:30:45Z",
+    "nextBillingDate": "2026-01-31T10:30:45Z",
+    "status": "active",
+    "trialEnd": null,
+    "canceledAt": null,
+    "cancelAtPeriodEnd": false,
+    "renewalCount": 5,
+    "subscriptionStartDate": "2025-07-31T10:30:45Z"
+  },
+  "invoice": {
+    "invoiceId": "inv_2025123100001",
+    "invoiceNumber": "INV-2025-12-31-0001",
+    "invoiceDate": "2025-12-31T10:30:45Z",
+    "dueDate": "2025-12-31T10:30:45Z",
+    "paidDate": "2025-12-31T10:30:45Z",
+    "status": "paid",
+    "invoiceUrl": "https://billing.company.com/invoices/inv_2025123100001",
+    "invoicePdfUrl": "https://cdn.company.com/invoices/inv_2025123100001.pdf",
+    "lineItems": [
+      {
+        "description": "Premium Monthly Subscription",
+        "quantity": 1,
+        "unitPrice": 99.99,
+        "amount": 99.99,
+        "period": "2025-12-31 to 2026-01-31"
+      }
+    ],
+    "subtotal": 99.99,
+    "tax": 8.50,
+    "total": 99.99,
+    "amountDue": 0.00,
+    "amountPaid": 99.99,
+    "currency": "USD"
+  },
+  "receipt": {
+    "receiptId": "rcpt_abc123xyz789",
+    "receiptNumber": "RCPT-2025-12-31-0001",
+    "receiptDate": "2025-12-31T10:30:45Z",
+    "receiptUrl": "https://billing.company.com/receipts/rcpt_abc123xyz789",
+    "receiptPdfUrl": "https://cdn.company.com/receipts/rcpt_abc123xyz789.pdf",
+    "emailSent": true,
+    "emailSentAt": "2025-12-31T10:30:47Z"
+  },
+  "refund": {
+    "refundable": true,
+    "refundableAmount": {
+      "value": 99.99,
+      "currency": "USD",
+      "formatted": "$99.99"
+    },
+    "refundPolicy": "30_day_money_back",
+    "refundDeadline": "2026-01-30T10:30:45Z"
+  },
+  "notifications": {
+    "emailSent": true,
+    "smsSent": false,
+    "pushSent": true,
+    "notificationsSentAt": "2025-12-31T10:30:47Z",
+    "channels": [
+      {
+        "channel": "email",
+        "status": "sent",
+        "sentAt": "2025-12-31T10:30:47Z",
+        "recipient": "john.doe@example.com",
+        "templateId": "payment_success_email"
+      },
+      {
+        "channel": "push",
+        "status": "delivered",
+        "sentAt": "2025-12-31T10:30:48Z",
+        "templateId": "payment_success_push"
+      }
+    ]
+  },
+  "reconciliation": {
+    "reconciledAt": null,
+    "reconciliationId": null,
+    "batchId": null,
+    "settlementBatchId": null,
+    "reconciledInBooks": false,
+    "accountingSystemId": null
+  },
+  "compliance": {
+    "pciCompliant": true,
+    "dataRetentionDays": 2555,
+    "dataRetentionExpiryDate": "2032-12-31T23:59:59Z",
+    "gdprCompliant": true,
+    "regulatoryRegion": "US",
+    "taxCompliant": true,
+    "auditTrailId": "audit_abc123xyz"
+  },
+  "analytics": {
+    "campaignId": null,
+    "referralSource": "direct",
+    "utmSource": null,
+    "utmMedium": null,
+    "utmCampaign": null,
+    "conversionId": "conv_abc123xyz",
+    "cohort": "2024-Q1",
+    "experimentId": null,
+    "variantId": null
+  },
+  "system": {
+    "processingTime": 1234,
+    "processingTimeMs": 1234,
+    "retryCount": 0,
+    "webhooksFired": 3,
+    "webhookStatus": "success",
+    "eventQueuedAt": "2025-12-31T10:30:45.100Z",
+    "eventProcessedAt": "2025-12-31T10:30:46.334Z",
+    "idempotencyKey": "idem_pay_abc123xyz789",
+    "apiVersion": "2025-12-01",
+    "sdkVersion": "stripe-node-v11.1.0"
+  },
+  "auditTrail": {
+    "createdAt": "2025-12-31T10:30:45Z",
+    "createdBy": "system",
+    "updatedAt": "2025-12-31T10:30:46Z",
+    "updatedBy": "system",
+    "version": 1,
+    "changelog": [
+      {
+        "timestamp": "2025-12-31T10:30:45Z",
+        "action": "payment_initiated",
+        "actor": "usr_1a2b3c4d5e6f",
+        "details": "Payment initiated by user"
+      },
+      {
+        "timestamp": "2025-12-31T10:30:45.500Z",
+        "action": "payment_authorized",
+        "actor": "stripe",
+        "details": "Payment authorized by payment processor"
+      },
+      {
+        "timestamp": "2025-12-31T10:30:46Z",
+        "action": "payment_captured",
+        "actor": "billing-service",
+        "details": "Payment captured successfully"
+      },
+      {
+        "timestamp": "2025-12-31T10:30:46.334Z",
+        "action": "payment_completed",
+        "actor": "billing-service",
+        "details": "Payment processing completed"
+      }
+    ]
+  },
+  "links": {
+    "self": "https://api.company.com/billing/v1/payments/pay_1a2b3c4d5e6f7g8h",
+    "customer": "https://api.company.com/customers/v1/customers/cust_1a2b3c4d5e6f",
+    "order": "https://api.company.com/orders/v1/orders/ord_abc123xyz789",
+    "subscription": "https://api.company.com/subscriptions/v1/subscriptions/sub_abc123xyz",
+    "invoice": "https://api.company.com/billing/v1/invoices/inv_2025123100001",
+    "receipt": "https://api.company.com/billing/v1/receipts/rcpt_abc123xyz789",
+    "refund": "https://api.company.com/billing/v1/payments/pay_1a2b3c4d5e6f7g8h/refund"
+  }
+}
+
